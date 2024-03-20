@@ -1,0 +1,14 @@
+.lab-home-container {
+    background-color: #fff; /* Background color for the whole page */
+  }
+  
+  .text-section {
+    padding: 20px; /* Add some padding to the text section */
+    padding-right: 10px; /* Spacing between text and image */
+  }
+  
+  .lab-image {
+    width: 100%; /* Make the image fill its container */
+    border-radius: 2px; /* Optional: Add some border radius to the image */
+  }
+  
