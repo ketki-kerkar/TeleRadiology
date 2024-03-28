@@ -1,4 +1,2 @@
 # TeleRadiology
 
-Hello!!
-Hii!!
