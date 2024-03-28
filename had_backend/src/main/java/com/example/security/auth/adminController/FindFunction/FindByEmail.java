@@ -17,7 +17,7 @@ public class FindByEmail {
     private final FindUser findUser;
 
 
-    @PostMapping("/user/email")
+    @PostMapping("/email")
     public ResponseEntity<UserDTO> getUserEntitiesByEmail(@RequestBody EmailRequest emailRequest) {
         String email = emailRequest.getEmail();
         return findUser.findUserEntitiesByEmail(email);
