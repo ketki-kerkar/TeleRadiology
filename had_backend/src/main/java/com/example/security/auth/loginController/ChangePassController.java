@@ -2,34 +2,25 @@ package com.example.security.auth.loginController;
 
 import com.example.security.auth.loginController.Requests.ChangePasswordRequest;
 import com.example.security.services.login.ChangePasswordService;
-import com.example.security.services.login.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("api/v1/authenticate")
 public class ChangePassController {
 
-    private final ChangePasswordService changePasswordService;
-    private final JwtService jwtService;
-
     @Autowired
-    public ChangePassController(ChangePasswordService changePasswordService, JwtService jwtService) {
-        this.changePasswordService = changePasswordService;
-        this.jwtService = jwtService;
-    }
+    private ChangePasswordService changePasswordService;
 
     @PostMapping("/changePass")
-    public ResponseEntity<String> changePassword(@RequestHeader(name = "Authorization") String token,
-                                                 @RequestBody ChangePasswordRequest request) {
-        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
-        if (userEmail == null) {
-            return ResponseEntity.badRequest().body("Invalid token");
-        }
-
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request) {
         String result = changePasswordService.changePassword(
-                userEmail,
+                request.getEmail(),
                 request.getCurrentPassword(),
                 request.getNewPassword(),
                 request.getConfirmNewPassword()

@@ -3,7 +3,6 @@ package com.example.security.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -51,9 +50,9 @@ public class Patient {
     @Column(name = "otp_content")
     private Integer otpContent;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIME)
     @Column(name = "otp_generation_time")
-    private Timestamp otpGenerationTime;
+    private Date otpGenerationTime;
 
     @Column(name = "email_id", nullable = false)
     private String emailId;
