@@ -1,0 +1,8 @@
+body{
+    background-color: #F7FBFF;
+};
+.custom-card{
+    height: 700px !important;
+    width: 400px;
+    color: white;
+}
