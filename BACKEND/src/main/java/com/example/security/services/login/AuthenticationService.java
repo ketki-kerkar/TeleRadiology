@@ -9,7 +9,6 @@ import com.example.security.auth.loginController.Requests.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,26 +62,6 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .role(role)
-                .build();
-    }
-
-    public AuthenticationResponse authenticateWithToken(String token) {
-        String userEmail = jwtService.extractUsername(token);
-        User user = userRepo.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Authentication using token, no password required
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                userEmail,
-                null,
-                null
-        ));
-
-        var jwtToken = jwtService.generateToken(user);
-
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .role(user.getRole().getRoleName())
                 .build();
     }
 }
