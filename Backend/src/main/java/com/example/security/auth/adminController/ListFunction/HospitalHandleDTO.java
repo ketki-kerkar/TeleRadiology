@@ -1,0 +1,15 @@
+package com.example.security.auth.adminController.ListFunction;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class HospitalHandleDTO {
+    private Long hospitalId;
+    private String hospitalName;
+}
