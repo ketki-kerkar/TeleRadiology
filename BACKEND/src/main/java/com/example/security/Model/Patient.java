@@ -35,7 +35,7 @@ public class Patient {
     private String bloodGroup;
 
     @Column(name = "contact")
-    private int contact;
+    private Long contact;
 
     @Column(name = "address", nullable = false)
     private String address;

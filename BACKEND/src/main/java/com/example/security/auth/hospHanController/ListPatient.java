@@ -31,6 +31,12 @@ public class ListPatient {
         return PatientDTO.builder()
                 .patientId(patient.getPatientId())
                 .name(patient.getName())
+                .age(patient.getAge())
+                .address(patient.getAddress())
+                .contact(patient.getContact())
+                .gender(patient.getGender())
+                .dateOfRegistration(patient.getDateOfRegistration())
+                .emailId(patient.getEmailId())
                 .build();
     }
 }
