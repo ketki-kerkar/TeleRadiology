@@ -16,7 +16,11 @@ import LabHome from './Actors/Lab/LabHome';
 import ListLab from './Actors/Admin/ListLab';
 import ListReceptionist from './Actors/Admin/ListReceptionist';
 import Upload from './Actors/Lab/UploadReports';
-
+import ReceptionistHome from './Actors/Receptionist/ReceptionistHome';
+import RadiologistHome from './Actors/Radiologist/RadiologistHome';
+import PatientDetails from './Actors/Doctor/PatientDetails'
+import ChangePassword from './Components/LoginComponent/ChangePassword';
+import CreateCase from './Actors/Receptionist/CreateCase';
 function App() {
   return (
     <div className="App">
@@ -25,18 +29,27 @@ function App() {
       <Route exact path='/' element={<LoginComponent/>} />
       <Route exact path='/admin' element={<AdminHome/>} />
       <Route path='/doctor' element={<DoctorHome/>} />
-      <Route path='lab' element={<LabHome/>}/>
+      <Route path='/lab' element={<LabHome/>}/>
+      <Route path='/receptionist' element={<ReceptionistHome/>}/>
+      <Route path='/radiologist' element={<RadiologistHome/>}/>
       <Route path='/admin/listDoctor/addDoctor' element={<AddDoctor/>} />
       <Route path='/admin/listDoctor' element={<ListDoctor/>} />
       <Route path='/admin/listLab' element = {<ListLab/>}/>
-      <Route path='admin/listReceptionist' element = {<ListReceptionist/>}/>
+      <Route path='/admin/listReceptionist' element = {<ListReceptionist/>}/>
       <Route path='/admin/listLab/addLab' element={<AddLab/>}/>
       <Route path='/admin/listReceptionist/addReceptionist' element={<AddReceptionist/>}/>
       <Route path='/receptionist/addpatient' element={<AddPatient/>}/>
       <Route path='/admin/viewDoctor' element={<ViewDoctor/>} />
       <Route path='/admin/viewHospital' element={<ViewHospital/>} />
       <Route path='/admin/viewLab' element={<ViewLab/>} />
+      <Route path='/lab/changePassword' element={<ChangePassword userRole="lab"/>}/>
+      <Route path='/admin/changePassword' element={<ChangePassword userRole="admin"/>}/>
+      <Route path='/doctor/changePassword' element={<ChangePassword userRole="doctor"/>}/>
+      <Route path='/radiologist/changePassword' element={<ChangePassword userRole="radiologist"/>}/>
+      <Route path='/receptionist/changePassword' element={<ChangePassword userRole="receptionist"/>}/>
       <Route path='/lab/upload' element={<Upload/>}/>
+      <Route path='/doctor/ViewPatient' element={<PatientDetails/>}/>
+      <Route path='/receptionist/newCase' element={<CreateCase/>}/>
       </Routes>
       </Router>
     </div>

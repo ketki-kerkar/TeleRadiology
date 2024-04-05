@@ -1,9 +1,9 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import { styled } from '@mui/system';
-import { Button, CssBaseline, TextField, Grid, Typography, Container } from '@mui/material';
+import { Button, CssBaseline, TextField, Grid, Typography, Container,  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from "../../Components/Navbar";
-import axios from 'axios'; // Import Axios
+import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
@@ -14,7 +14,6 @@ const theme = createTheme({
   },
 });
 
-
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(8),
   display: "flex",
@@ -22,176 +21,152 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   alignItems: "center",
 }));
 
-
 const StyledForm = styled('form')(({ theme }) => ({
-  width: "65vw",
+  width: "55vw",
   marginTop: theme.spacing(3)
 }));
 
 export default function AddReceptionist() {
-  const [contact, setContact] = useState("");
-
   const [hospitalName, setHospitalName] = useState("");
   const [nameError, setNameError] = useState(false);
-  
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
-
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-
+  const [openDialog, setOpenDialog] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleContactChange = (event) => {
-    let value = event.target.value;
-    value = value.replace(/\D/g, "");
-    value = value.slice(0, 10);
-    setContact(value);
-  };
+ 
 
-  const handleNameChange = (event) => {
+  const handlehospitalNameChange = (event) => {
     const value = event.target.value;
     setHospitalName(value);
-    setNameError(value.length < 3); // Set error if name is less than or equal to 3 characters
+    setNameError(value.length < 3);
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
 
   const handleEmailChange = (event) => {
     const value = event.target.value;
     setEmail(value);
-    setEmailError(!validateEmail(value)); // Set error if email is invalid
+    setEmailError(!validateEmail(value));
   };
 
-  const validateEmail = (email) => {
-    // Regular expression for validating email
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
 
-  const handleSubmit = () => {
-    // Create an object with the form data
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmitting(true);
     const formData = {
       hospitalName: hospitalName,
       email: email,
-      contact: contact
     };
-
-    // Send the form data to the backend using Axios
     axios.post('http://localhost:9191/api/v1/admin/add-receptionist', formData)
       .then(response => {
-        console.log(response.data);
-        // Set registrationSuccess to true
-        setRegistrationSuccess(true);
-        // Redirect to homepage after 2 seconds
-        setTimeout(() => {
-          navigate('/admin/listReceptionist'); // Replace '/' with the URL of your homepage
-        }, 2000);
+        setSubmitting(false);
+        setOpenDialog(true);
       })
       .catch(error => {
         console.error('Error:', error);
+        setSubmitting(false);
       });
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    navigate('/admin/listReceptionist');
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <body style={{ backgroundColor: '#F7FBFF', margin: 0, padding: 0 }}>
-        <Navbar userRole="admin" />
-        <StyledContainer component="main" maxWidth="xs">
-          <CssBaseline />
-          <div>
-            <Typography component="h1" variant="h5">
-              Receptionist Registration
-            </Typography>
-            <StyledForm>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    autoComplete="Hname"
-                    name="hName"
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="hName"
-                    label="Hospital Name"
-                    autoFocus
-                    helperText={nameError ? "Enter a valid Name" : ""}
-                    onChange={handleNameChange}
-                    sx={{
-                      backgroundColor: '#fff',
-                      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                      '& .MuiInputLabel-root': {color: '#000'},
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: '#000', borderRadius: '4px' },
-                        '&:hover fieldset': { borderColor: '#000' },
-                        '&.Mui-focused fieldset': { borderColor: '#000' },
-                      },
-                    }}
+        <Navbar userRole="admin"/>
+    <StyledContainer component="main" maxWidth="xs">
+      <CssBaseline />
+      <div>
+        <Typography component="h1" variant="h5">
+          Receptionist Registration
+        </Typography>
+        <StyledForm noValidate>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                autoComplete="Hname"
+                name="hName"
+                variant="outlined"
+                required
+                fullWidth
+                id="hName"
+                label="Hospital Name"
+                autoFocus
+                helperText={nameError ? "Enter a valid Name" : ""}
+                onChange={handlehospitalNameChange}
+                sx={{
+                  backgroundColor: '#fff',
+                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                  '& .MuiInputLabel-root': {color: '#000'},
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: '#000', borderRadius: '4px' },
+                    '&:hover fieldset': { borderColor: '#000' },
+                    '&.Mui-focused fieldset': { borderColor: '#000' },  },}}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    value={email}
-                    helperText={emailError ? "Enter a valid email" : ""}
-                    onChange={handleEmailChange}
-                    sx={{
-                      backgroundColor: '#fff',
-                      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                      '& .MuiInputLabel-root': {color: '#000'},
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: '#000', borderRadius: '4px' },
-                        '&:hover fieldset': { borderColor: '#000' },
-                        '&.Mui-focused fieldset': { borderColor: '#000' },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    name="contact"
-                    label="Contact Number"
-                    type="text"
-                    autoComplete="contact"
-                    id="contact"
-                    value={contact}
-                    onChange={handleContactChange}
-                    sx={{
-                      backgroundColor: '#fff',
-                      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                      '& .MuiInputLabel-root': {color: '#000'},
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: '#000', borderRadius: '4px' },
-                        '&:hover fieldset': { borderColor: '#000' },
-                        '&.Mui-focused fieldset': { borderColor: '#000' },
-                      },
-                    }}
-                  />
-                </Grid>
               </Grid>
-              {registrationSuccess && (
-              <Typography variant="body1" color="primary" align="center">
-                Registration successful! Redirecting to homepage...
-              </Typography>
-              )}
-              <Button
-                variant="contained"
-                onClick={handleSubmit} // Call handleSubmit function when the button is clicked
-                style={{
-                  borderRadius: '5px', position: 'fixed', height: '5.8vh', width: '15vw', marginTop: '15px', right: '17.5vw', backgroundColor: '#7fdeff', color: '#000', fontFamily: 'Quicksand, sans-serif',
-                  fontSize: '1vw'
-                }}
-              >
-                Submit
-              </Button>
-            </StyledForm>
-          </div>
-        </StyledContainer>
-      </body>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  value={email}
+                  helperText={emailError ? "Enter a valid email" : ""}
+                  onChange={handleEmailChange}
+                  sx={{
+                    backgroundColor: '#fff',
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    '& .MuiInputLabel-root': {color: '#000'},
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#000', borderRadius: '4px' },
+                      '&:hover fieldset': { borderColor: '#000' },
+                      '&.Mui-focused fieldset': { borderColor: '#000' },},}}
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              style={{ marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }}
+              disabled={submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? 'Submitting...' : 'Submit'}
+            </Button>
+          </StyledForm>
+        </div>
+      </StyledContainer>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Registration Successful</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Your registration has been successful. Redirecting to homepage...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }
+
+        
