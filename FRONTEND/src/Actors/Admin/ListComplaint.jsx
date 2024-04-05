@@ -65,9 +65,9 @@ export default function ListComplaint() {
           placeholder="Search by Complaint ID" 
           value={searchQuery} 
           onChange={(e) => setSearchQuery(e.target.value)} 
-          style={{ height: '40px', width: '300px', marginRight: '10px' }} 
+          style={{ height: '40px', width: '300px', marginRight: '10px',borderRadius:'3px' }} 
         />
-        <Button variant="contained" onClick={handleSearch} style={{ minWidth: '25px' ,height: '40px',backgroundColor: '#7FDEFF',color: '#000000'}}>
+        <Button variant="contained" onClick={handleSearch} style={{ minWidth: '25px' ,height: '40px',backgroundColor: '#7FDEFF',color: '#000000',borderRadius:'3px' }}>
           <SearchIcon />
         </Button>
       </div>
