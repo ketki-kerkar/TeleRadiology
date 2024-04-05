@@ -1,6 +1,6 @@
-import {React, useState} from "react";
+import React, { useState } from "react";
 import { styled } from '@mui/system';
-import { Button, CssBaseline, TextField,  Grid, Typography, Container} from '@mui/material';
+import { Button, CssBaseline, TextField, Grid, Typography, Container , Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from "../../Components/Navbar";
 import axios from 'axios';
@@ -22,76 +22,69 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 }));
 
 const StyledForm = styled('form')(({ theme }) => ({
-  width: "65vw",
+  width: "55vw",
   marginTop: theme.spacing(3)
 }));
 
 export default function AddLab() {
-  const [contact, setContact] = useState("");
 
   const [labName, setlabName] = useState("");
   const [nameError, setNameError] = useState(false);
-  
+
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
 
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  
+  const [submitting, setSubmitting] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
 
   const navigate = useNavigate();
 
-  const handleContactChange = (event) => {
-    let value = event.target.value;
-    value = value.replace(/\D/g, "");
-    value = value.slice(0, 10);
-    setContact(value);
-  };
-
   const handleNameChange = (event) => {
     const value = event.target.value;
     setlabName(value);
-    setNameError(value.length < 3); // Set error if name is less than or equal to 3 characters
+    setNameError(value.length < 3);
   };
 
   const handleEmailChange = (event) => {
     const value = event.target.value;
     setEmail(value);
-    setEmailError(!validateEmail(value)); // Set error if email is invalid
+    setEmailError(!validateEmail(value));
   };
 
   const validateEmail = (email) => {
-    // Regular expression for validating email
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
   const handleSubmit = () => {
-    // Create an object with the form data
+    setSubmitting(true);
     const formData = {
       labName: labName,
       email: email,
-      contact: contact
     };
 
-    // Send the form data to the backend using Axios
     axios.post('http://localhost:9191/api/v1/admin/add-lab', formData)
-     .then(response => {
-      console.log(response.data);
-      // Set registrationSuccess to true
-      setRegistrationSuccess(true);
-      // Redirect to homepage after 2 seconds
-      setTimeout(() => {
-        navigate('/admin/listLab'); // Replace '/' with the URL of your homepage
-      }, 2000);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .then(response => {
+        setSubmitting(false);
+        setOpenDialog(true);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setSubmitting(false);
+      });
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    navigate('/admin/listLab');
   };
+
   return (
     <ThemeProvider theme={theme}>
-      <body style={{backgroundColor: '#F7FBFF', margin: 0, padding: 0}}>
-        <Navbar userRole="admin"/>
+      <body style={{ backgroundColor: '#F7FBFF', margin: 0, padding: 0 }}>
+        <Navbar userRole="admin" />
         <StyledContainer component="main" maxWidth="xs">
           <CssBaseline />
           <div>
@@ -110,7 +103,7 @@ export default function AddLab() {
                     id="labName"
                     label="Lab Name"
                     autoFocus
-                    value = {labName}
+                    value={labName}
                     helperText={nameError ? "Enter a valid Name" : ""}
                     onChange={handleNameChange}
                     sx={{
@@ -148,48 +141,40 @@ export default function AddLab() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    name="contact"
-                    label="Contact Number"
-                    type="text"
-                    autoComplete="contact"
-                    id="contact"
-                    value={contact}
-                    onChange={handleContactChange}
-                    sx={{
-                      backgroundColor: '#fff',
-                      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                      '& .MuiInputLabel-root': {color: '#000'},
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: '#000', borderRadius: '4px' },
-                        '&:hover fieldset': { borderColor: '#000' },
-                        '&.Mui-focused fieldset': { borderColor: '#000' },
-                      },
-                    }}
-                  />
-                </Grid>
               </Grid>
-              {registrationSuccess && (
-              <Typography variant="body1" color="primary" align="center">
-                Registration successful! Redirecting to homepage...
-              </Typography>
-              )}
-              <Button onClick={handleSubmit}
-                variant="contained"
-                style={{
-                  borderRadius:'5px', position: 'fixed', height:'5.8vh', width:'15vw',
-                  marginTop:'15px', right:'17.5vw', backgroundColor: '#7fdeff', color:'#000',
-                  fontFamily: 'Quicksand, sans-serif', fontSize: '1vw',
-                }}
-              >
-                Submit
-              </Button>
+              <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              style={{ marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }}
+              disabled={submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? 'Submitting...' : 'Submit'}
+            </Button>
             </StyledForm>
           </div>
         </StyledContainer>
       </body>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Registration Successful</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Your registration has been successful. Redirecting to homepage...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }
+
