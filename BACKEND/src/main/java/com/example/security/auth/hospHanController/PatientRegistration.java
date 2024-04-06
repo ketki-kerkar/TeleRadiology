@@ -16,12 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class PatientRegistration {
     private static final Logger logger = LoggerFactory.getLogger(PatientRegistration.class);
 
-    private final PatientRegistrationService patientRegistrationService;
-
     @Autowired
-    public PatientRegistration(PatientRegistrationService patientRegistrationService) {
-        this.patientRegistrationService = patientRegistrationService;
-    }
+    private PatientRegistrationService patientRegistrationService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerPatient(@RequestBody Patient patient) {
