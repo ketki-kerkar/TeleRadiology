@@ -1,9 +1,9 @@
 package com.example.security.Model;
 
+import com.example.security.Model.Actors.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -36,7 +36,7 @@ public class Patient {
     private String bloodGroup;
 
     @Column(name = "contact")
-    private int contact;
+    private Long contact;
 
     @Column(name = "address", nullable = false)
     private String address;
@@ -51,14 +51,18 @@ public class Patient {
     @Column(name = "otp_content")
     private Integer otpContent;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIME)
     @Column(name = "otp_generation_time")
-    private Timestamp otpGenerationTime;
+    private Date otpGenerationTime;
 
     @Column(name = "email_id", nullable = false)
     private String emailId;
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
 
 }
