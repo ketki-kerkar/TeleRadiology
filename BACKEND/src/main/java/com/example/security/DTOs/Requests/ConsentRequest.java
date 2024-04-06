@@ -15,6 +15,5 @@ public class ConsentRequest {
     private Long caseId;
     private Long doctorId;
     private Long patientId;
-    //@Builder.Default
-   // private String consentStatus="pending";
+
 }

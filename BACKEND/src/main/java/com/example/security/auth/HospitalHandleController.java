@@ -1,7 +1,11 @@
 package com.example.security.auth;
 import com.example.security.DTOs.PatientDTO;
+import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.DTOs.Requests.CaseCreationRequest;
-import com.example.security.Model.Patient;
+import com.example.security.DTOs.Requests.DoctorRegisterRequest;
+import com.example.security.DTOs.Requests.PatientRegistrationRequest;
+import com.example.security.Model.Actors.Patient;
+import com.example.security.services.admin.AddUser;
 import com.example.security.services.hospitalHandle.PatientRegistrationService;
 import com.example.security.services.hospitalHandle.ViewPatient;
 import org.slf4j.Logger;
@@ -27,7 +31,10 @@ public class HospitalHandleController {
     @Autowired
     private CaseService caseService;
 
-    @PostMapping("/registerPatient")
+    @Autowired
+    private AddUser addUser;
+
+   /* @PostMapping("/registerPatient")
     public ResponseEntity<String> registerPatient(@RequestBody Patient patient) {
         try {
             logger.info("Received request to register patient: {}", patient);
@@ -38,7 +45,13 @@ public class HospitalHandleController {
             logger.error("Error registering patient: {}", e.getMessage());
             return new ResponseEntity<>("Failed to register patient", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
+   @PostMapping("/add-patient")
+   public ResponseEntity<AuthenticationResponse> registerPatient(
+           @RequestBody PatientRegistrationRequest request
+   ){
+       return ResponseEntity.ok(addUser.registerPatient(request));
+   }
 
     @GetMapping("/viewPatients")
     public ResponseEntity<List<PatientDTO>> getAllPatient() {

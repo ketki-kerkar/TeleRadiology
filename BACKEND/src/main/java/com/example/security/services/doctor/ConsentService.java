@@ -4,7 +4,7 @@ import com.example.security.DTOs.Requests.ConsentRequest;
 import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Case;
 import com.example.security.Model.Consent;
-import com.example.security.Model.Patient;
+import com.example.security.Model.Actors.Patient;
 import com.example.security.Repositories.CaseRepo;
 import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.PatientRepo;

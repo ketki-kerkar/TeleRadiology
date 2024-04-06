@@ -1,11 +1,11 @@
 package com.example.security.Model;
 
 import com.example.security.Model.Actors.Doctor;
+import com.example.security.Model.Actors.Patient;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @Getter
