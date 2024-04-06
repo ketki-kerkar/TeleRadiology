@@ -21,6 +21,9 @@ import RadiologistHome from './Actors/Radiologist/RadiologistHome';
 import PatientDetails from './Actors/Doctor/PatientDetails'
 import ChangePassword from './Components/LoginComponent/ChangePassword';
 import CreateCase from './Actors/Receptionist/CreateCase';
+import PatientHome from './Actors/Patient/PatientHome';
+import ViewCase from './Actors/Patient/ViewCase';
+import ViewProfile from './Actors/Patient/ViewProfile';
 function App() {
   return (
     <div className="App">
@@ -31,6 +34,9 @@ function App() {
       <Route path='/doctor' element={<DoctorHome/>} />
       <Route path='/lab' element={<LabHome/>}/>
       <Route path='/receptionist' element={<ReceptionistHome/>}/>
+      <Route path='/patient' element={<PatientHome/>}/>
+      <Route path='/patient/viewCase' element={<ViewCase/>}/>
+      <Route path='/patient/viewProfile' element={<ViewProfile/>}/>
       <Route path='/radiologist' element={<RadiologistHome/>}/>
       <Route path='/admin/listDoctor/addDoctor' element={<AddDoctor/>} />
       <Route path='/admin/listDoctor' element={<ListDoctor/>} />

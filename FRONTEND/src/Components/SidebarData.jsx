@@ -154,6 +154,32 @@ export const SidebarData = {
       cName: 'nav-text'
     },
   ],
+  patient: [
+    {
+      title: 'Home',
+      path: '/patient',
+      icon: <HomeIcon className="icon-hover"/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Profile',
+      path: '/patient/viewProfile',
+      icon: <AccountCircleIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'View Policy',
+      path: '/patient/viewPolicy',
+      icon: <GradingIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Launch Complaint',
+      path: '/patient/launchComplaint',
+      icon: < FeedbackIcon/>,
+      cName: 'nav-text'
+    },
+  ],
   radiologist:[
     {
       title: 'Home',
@@ -187,5 +213,7 @@ export const SidebarData = {
     },
   ]
 };
+
+
 
 
