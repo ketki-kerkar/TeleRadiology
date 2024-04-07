@@ -24,6 +24,8 @@ import CreateCase from './Actors/Receptionist/CreateCase';
 import PatientHome from './Actors/Patient/PatientHome';
 import ViewCase from './Actors/Patient/ViewCase';
 import ViewProfile from './Actors/Patient/ViewProfile';
+import ViewPolicy from './Actors/Patient/ViewPolicy';
+import LaunchComplaint from './Actors/Patient/LaunchComplaint';
 function App() {
   return (
     <div className="App">
@@ -34,9 +36,6 @@ function App() {
       <Route path='/doctor' element={<DoctorHome/>} />
       <Route path='/lab' element={<LabHome/>}/>
       <Route path='/receptionist' element={<ReceptionistHome/>}/>
-      <Route path='/patient' element={<PatientHome/>}/>
-      <Route path='/patient/viewCase' element={<ViewCase/>}/>
-      <Route path='/patient/viewProfile' element={<ViewProfile/>}/>
       <Route path='/radiologist' element={<RadiologistHome/>}/>
       <Route path='/admin/listDoctor/addDoctor' element={<AddDoctor/>} />
       <Route path='/admin/listDoctor' element={<ListDoctor/>} />
@@ -56,6 +55,12 @@ function App() {
       <Route path='/lab/upload' element={<Upload/>}/>
       <Route path='/doctor/ViewPatient' element={<PatientDetails/>}/>
       <Route path='/receptionist/newCase' element={<CreateCase/>}/>
+      <Route path='/patient' element={<PatientHome/>}/>
+      <Route path='/patient/viewCase' element={<ViewCase/>}/>
+      <Route path='/patient/viewProfile' element={<ViewProfile/>}/>
+      <Route path='/patient/viewPolicy' element={<ViewPolicy/>}/> 
+      <Route path='/patient/launchComplaint' element={<LaunchComplaint/>}/>
+      </Routes>
       </Routes>
       </Router>
     </div>
