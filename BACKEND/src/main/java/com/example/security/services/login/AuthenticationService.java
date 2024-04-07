@@ -1,11 +1,11 @@
 package com.example.security.services.login;
 
+import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.Model.Actors.Role;
 import com.example.security.Model.Actors.User;
 import com.example.security.Repositories.*;
-import com.example.security.auth.loginController.*;
-import com.example.security.auth.loginController.Requests.AuthenticationRequest;
-import com.example.security.auth.loginController.Requests.RegisterRequest;
+import com.example.security.DTOs.Requests.AuthenticationRequest;
+import com.example.security.DTOs.Requests.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

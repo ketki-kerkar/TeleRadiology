@@ -1,5 +1,5 @@
 package com.example.security.Repositories;
-import com.example.security.Model.Patient;
+import com.example.security.Model.Actors.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

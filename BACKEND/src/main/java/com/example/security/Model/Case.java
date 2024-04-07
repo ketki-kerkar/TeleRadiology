@@ -1,6 +1,7 @@
 package com.example.security.Model;
 
 import com.example.security.Model.Actors.Doctor;
+import com.example.security.Model.Actors.Patient;
 import com.example.security.converter.LongListConverter;
 import lombok.*;
 import jakarta.persistence.*;
@@ -24,7 +25,7 @@ public class Case {
     private String caseSummary;
 
     @Column(name = "case_status", nullable = false)
-    private Boolean caseStatus; //Default 'True'
+    private Boolean caseStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "case_registration_date", nullable = false, updatable = false)
