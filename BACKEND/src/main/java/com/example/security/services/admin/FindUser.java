@@ -1,6 +1,9 @@
-
 package com.example.security.services.admin;
 
+import com.example.security.DTOs.DoctorDTO;
+import com.example.security.DTOs.HospitalHandleDTO;
+import com.example.security.DTOs.LabDTO;
+import com.example.security.DTOs.UserDTO;
 import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Actors.HospitalHandle;
 import com.example.security.Model.Actors.Lab;
@@ -9,10 +12,6 @@ import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.HospitalHandleRepo;
 import com.example.security.Repositories.LabRepo;
 import com.example.security.Repositories.UserRepo;
-import com.example.security.auth.adminController.FindFunction.UserDTO;
-import com.example.security.auth.adminController.ListFunction.DoctorDTO;
-import com.example.security.auth.adminController.ListFunction.HospitalHandleDTO;
-import com.example.security.auth.adminController.ListFunction.LabDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

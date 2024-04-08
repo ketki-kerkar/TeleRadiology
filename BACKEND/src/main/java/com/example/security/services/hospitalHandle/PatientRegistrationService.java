@@ -1,6 +1,7 @@
 package com.example.security.services.hospitalHandle;
 
-import com.example.security.Model.Patient;
+import com.example.security.Model.Actors.Patient;
+import com.example.security.Model.Actors.User;
 import com.example.security.Repositories.PatientRepo;
 import com.example.security.services.login.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,11 @@ public class PatientRegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void registerPatient(Patient patient) {
-        calculateAndSetAge(patient);
-        setRegistrationDate(patient);
-        String unencryptedPassword = generateRandomPassword();
-        patient.setPassword(passwordEncoder.encode(unencryptedPassword));
-        patientRepo.save(patient);
-        sendPasswordEmail(patient, unencryptedPassword);
+    public int calculateAge(Date dob) {
+        LocalDate birthDate = dob.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate currentDate = LocalDate.now();
+        int age = Period.between(birthDate, currentDate).getYears();
+        return age;
     }
 
     private void calculateAndSetAge(Patient patient) {
@@ -57,9 +56,9 @@ public class PatientRegistrationService {
         return password.toString();
     }
 
-    private void sendPasswordEmail(Patient patient, String unencryptedPassword) {
+    private void sendPasswordEmail(User user, String unencryptedPassword) {
         String subject = "Your password for patient portal";
         String message = "Your password is: " + unencryptedPassword;
-        mailService.sendMail(patient.getEmailId(), subject, message);
+        mailService.sendMail(user.getEmail(), subject, message);
     }
 }
