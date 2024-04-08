@@ -25,7 +25,7 @@ public class Case {
     private String caseSummary;
 
     @Column(name = "case_status", nullable = false)
-    private Boolean caseStatus; //Default 'True'
+    private Boolean caseStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "case_registration_date", nullable = false, updatable = false)

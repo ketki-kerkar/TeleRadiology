@@ -45,6 +45,9 @@ public class Consent {
     private Case cases;
 
     @Column
-    @ElementCollection //Annotation used in JPA to map collection of elements to a database table
+    @ElementCollection//Annotation used in JPA to map collection of elements to a database table
     private List<Long> listOfRadiologistId;
+
+
+
 }

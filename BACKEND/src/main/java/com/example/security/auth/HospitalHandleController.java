@@ -1,4 +1,5 @@
 package com.example.security.auth;
+
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.DTOs.Requests.CaseCreationRequest;
@@ -73,5 +74,4 @@ public class HospitalHandleController {
         caseService.createCase(request.getPatientEmail(), request.getDoctorEmail());
         return ResponseEntity.ok("Case created successfully");
     }
-
 }

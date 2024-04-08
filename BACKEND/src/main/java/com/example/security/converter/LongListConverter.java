@@ -1,5 +1,4 @@
 package com.example.security.converter;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.util.Arrays;
@@ -29,4 +28,3 @@ public class LongListConverter implements AttributeConverter<List<Long>, String>
                 .collect(Collectors.toList());
     }
 }
-

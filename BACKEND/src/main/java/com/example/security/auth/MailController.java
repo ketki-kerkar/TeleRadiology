@@ -1,4 +1,4 @@
-package com.example.security.auth.loginController;
+package com.example.security.auth;
 
 import com.example.security.services.login.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
