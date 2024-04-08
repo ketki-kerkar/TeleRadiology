@@ -1,5 +1,6 @@
 package com.example.security.auth;
 
+import com.example.security.DTOs.DoctorByHospitalDTO;
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.DTOs.Requests.CaseCreationRequest;
@@ -7,8 +8,10 @@ import com.example.security.DTOs.Requests.DoctorRegisterRequest;
 import com.example.security.DTOs.Requests.PatientRegistrationRequest;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.services.admin.AddUser;
+import com.example.security.services.hospitalHandle.ListDoctor;
 import com.example.security.services.hospitalHandle.PatientRegistrationService;
 import com.example.security.services.hospitalHandle.ViewPatient;
+import com.example.security.services.login.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,12 @@ public class HospitalHandleController {
 
     @Autowired
     private AddUser addUser;
+
+    @Autowired
+    private ListDoctor listDoctor;
+
+    @Autowired
+    private JwtService jwtService;
 
     /* @PostMapping("/registerPatient")
      public ResponseEntity<String> registerPatient(@RequestBody Patient patient) {
@@ -73,5 +82,20 @@ public class HospitalHandleController {
     public ResponseEntity<String> createCase(@RequestBody CaseCreationRequest request) {
         caseService.createCase(request.getPatientEmail(), request.getDoctorEmail());
         return ResponseEntity.ok("Case created successfully");
+    }
+
+    @GetMapping("/list-doctors")
+    public ResponseEntity<List<DoctorByHospitalDTO>> getDoctorsByHospital(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<DoctorByHospitalDTO> doctors = listDoctor.getDoctorsByHospital(userEmail)
+                .stream()
+                .map(doctor -> new DoctorByHospitalDTO(doctor.getDName(), doctor.getUser().getEmail()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(doctors);
     }
 }

@@ -12,4 +12,5 @@ public interface HospitalHandleRepo extends JpaRepository<HospitalHandle,Long > 
     Optional<HospitalHandle> findByHospitalName(String hospitalName);
     List<HospitalHandle> findAll();
     List<HospitalHandle> findByUserUserId(UUID userId);
+    Optional<HospitalHandle> findByUserEmail(String userEmail);
 }
