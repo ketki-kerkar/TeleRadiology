@@ -21,11 +21,17 @@ import RadiologistHome from './Actors/Radiologist/RadiologistHome';
 import PatientDetails from './Actors/Doctor/PatientDetails'
 import ChangePassword from './Components/LoginComponent/ChangePassword';
 import CreateCase from './Actors/Receptionist/CreateCase';
+
 import PatientHome from './Actors/Patient/PatientHome';
 import ViewCase from './Actors/Patient/ViewCase';
 import ViewProfile from './Actors/Patient/ViewProfile';
 import ViewPolicy from './Actors/Patient/ViewPolicy';
 import LaunchComplaint from './Actors/Patient/LaunchComplaint';
+import ForgetPassword from './Components/ForgetPassword';
+import CreateCase from './Actors/Receptionist/CreateCase';
+import OTPgen from './Components/OTPgen';
+import NewPassAfterOtp from './Components/NewPassAfterOtp';
+
 function App() {
   return (
     <div className="App">
@@ -55,12 +61,15 @@ function App() {
       <Route path='/lab/upload' element={<Upload/>}/>
       <Route path='/doctor/ViewPatient' element={<PatientDetails/>}/>
       <Route path='/receptionist/newCase' element={<CreateCase/>}/>
+      
       <Route path='/patient' element={<PatientHome/>}/>
       <Route path='/patient/viewCase' element={<ViewCase/>}/>
       <Route path='/patient/viewProfile' element={<ViewProfile/>}/>
       <Route path='/patient/viewPolicy' element={<ViewPolicy/>}/> 
       <Route path='/patient/launchComplaint' element={<LaunchComplaint/>}/>
-      </Routes>
+      <Route path='/otpGen' element={<OTPgen/>}/>
+      <Route path='/newPass' element={<NewPassAfterOtp/>}/>
+      
       </Routes>
       </Router>
     </div>

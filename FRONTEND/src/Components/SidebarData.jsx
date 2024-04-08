@@ -10,6 +10,9 @@ import PeopleIcon from '@mui/icons-material/People';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import GradingIcon from '@mui/icons-material/Grading';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 import './Navbar.css';
 
 
@@ -179,6 +182,12 @@ export const SidebarData = {
       icon: < FeedbackIcon/>,
       cName: 'nav-text'
     },
+    {
+      title: 'Change Password',
+      path: '/patient/changePassword',
+      icon: < FeedbackIcon/>,
+      cName: 'nav-text'
+    },
   ],
   radiologist:[
     {
@@ -213,7 +222,5 @@ export const SidebarData = {
     },
   ]
 };
-
-
 
 
