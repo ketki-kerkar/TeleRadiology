@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Typography, Button, Container, Grid, Paper } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import LockResetIcon from '@mui/icons-material/LockReset';
+import axios from 'axios';
 
 function OTPgen() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [message, setMessage] = useState('');
   const [isOtpComplete, setIsOtpComplete] = useState(false);
-
+  const location = useLocation();
+  const email = location.state?.email || '';
   const inputRefs = [
     useRef(null),
     useRef(null),
@@ -19,18 +21,14 @@ function OTPgen() {
   ];
 
   useEffect(() => {
-    // Check if all OTP digits are filled
     setIsOtpComplete(otp.every(digit => digit !== ''));
   }, [otp]);
 
   const handleChange = (index, value) => {
-    // Allow only numeric input
     if (/^\d*$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-
-      // Move focus to the next input field if available
       if (value !== '' && index < 5) {
         inputRefs[index + 1].current.focus();
       }
@@ -42,6 +40,14 @@ function OTPgen() {
     const enteredOTP = otp.join('');
     if (enteredOTP.length === 6 && /^\d+$/.test(enteredOTP)) {
       setMessage('OTP verified successfully.');
+      // Redirect to NewPassAfterOtp component with email and OTP values
+      // Using Link component
+      return (
+        <Link to={{
+          pathname: "/newPass",
+          state: { email, otp: otp.join('') } // Pass email and OTP
+        }} />
+      );
     } else {
       setMessage('Invalid OTP. Please enter a 6-digit numeric OTP.');
     }
@@ -54,7 +60,6 @@ function OTPgen() {
           <Avatar sx={{ bgcolor: '#1976D2',  margin: 'auto' , marginBottom:'10px'}}>
             <LockResetIcon />
           </Avatar>
-          
           <Typography variant="h6" gutterBottom style={{ fontFamily: 'Quicksand' ,color: '#808080'}}>Enter the OTP sent to your registered Email Id !</Typography>
           {message && <Typography variant="body1" gutterBottom style={{ fontFamily: 'Quicksand' }}>{message}</Typography>}
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -81,11 +86,15 @@ function OTPgen() {
                 </Grid>
               ))}
             </Grid>
-            <Link to="/newPass" style={{ textDecoration: 'none' }}>
-            <Button type="submit" variant="contained" color="primary" style={{ marginTop: '20px', fontSize: '1.2rem' }} disabled={!isOtpComplete}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              style={{ marginTop: '20px', fontSize: '1.2rem' }}
+              disabled={!isOtpComplete}
+            >
               Verify OTP
             </Button>
-            </Link>
           </form>
         </Paper>
       </div>
@@ -94,4 +103,3 @@ function OTPgen() {
 }
 
 export default OTPgen;
-

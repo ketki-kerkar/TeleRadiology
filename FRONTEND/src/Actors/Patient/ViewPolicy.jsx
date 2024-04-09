@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Box, TabScrollButton, Typography , Checkbox } from '@mui/material';
+import { Box, Typography , Checkbox } from '@mui/material';
 import Navbar from '../../Components/Navbar';
 import { Link } from 'react-router-dom';
 
-export default function ViewPolicy() {
+export default function ViewPolicy({ isSidebarOpen, onSidebarToggle }) {
   const boxRef = useRef(null);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
@@ -15,11 +15,9 @@ export default function ViewPolicy() {
     setIsCheckboxChecked(event.target.checked);
   };
 
- 
-
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar userRole="patient" />
+      <Navbar userRole="patient" isSidebarOpen={isSidebarOpen} onSidebarToggle={onSidebarToggle} />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '5vh', marginLeft: '9vw', width: '80vw' }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ width: '100%', position: 'relative', marginLeft: '2vw' }}>
@@ -104,3 +102,4 @@ export default function ViewPolicy() {
     </div>
   );
 }
+

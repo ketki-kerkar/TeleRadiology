@@ -13,6 +13,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import GradingIcon from '@mui/icons-material/Grading';
 import FeedbackIcon from '@mui/icons-material/Feedback';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import './Navbar.css';
 
 
@@ -185,7 +186,7 @@ export const SidebarData = {
     {
       title: 'Change Password',
       path: '/patient/changePassword',
-      icon: < FeedbackIcon/>,
+      icon: < LockResetIcon/>,
       cName: 'nav-text'
     },
   ],

@@ -1,44 +1,57 @@
+// NewPassAfterOtp.jsx
 import React, { useState } from 'react';
 import { TextField, Button, Grid, Paper, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
+import axios from 'axios'; // Import Axios for making HTTP requests
 
- function NewPassAfterOtp() {
- // const [oldPassword, setOldPassword] = useState('');
+function NewPassAfterOtp() {
   const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmNewPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  // Extract email and OTP from query parameters using useLocation hook
+  const location = useLocation();
+  const { email, otp } = location.state || {};
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate form data
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       setError("Passwords don't match");
       return;
     }
-    // Implement logic for changing password
-    console.log('Changing password...');
-    // Reset form fields
-    //setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setError('');
+    // Make API call to change password
+    try {
+      const response = await axios.post('http://localhost:9191/api/v1/reset-password', {
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+        confirmNewPassword: confirmNewPassword
+      });
+      // Handle successful response
+      console.log('Password changed successfully:', response.data);
+      // Optionally, redirect user to a success page or display a success message
+    } catch (error) {
+      // Handle error
+      console.error('Error changing password:', error);
+      setError('An error occurred. Please try again later.');
+    }
   };
 
   return (
     <div>
-      <Grid container justifyContent="center" style={{ height: '100vh', marginTop:'60px'}}>
+      <Grid container justifyContent="center" style={{ height: '100vh', marginTop: '60px' }}>
         <Grid item xs={6}>
           <Paper style={{ padding: 20 }}>
-          <Avatar sx={{ bgcolor: '#1976D2',  margin: 'auto' , marginBottom:'10px'}}>
-         <EnhancedEncryptionIcon/>
-        </Avatar>
+            <Avatar sx={{ bgcolor: '#1976D2', margin: 'auto', marginBottom: '10px' }}>
+              <EnhancedEncryptionIcon />
+            </Avatar>
             <Typography variant="h5" gutterBottom>
               Change Password
             </Typography>
             <form onSubmit={handleSubmit}>
-              
               <TextField
                 label="New Password"
                 type="password"
@@ -47,28 +60,19 @@ import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoFocus
-                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
-                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
-                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
               />
               <TextField
                 label="Confirm New Password"
                 type="password"
                 fullWidth
                 margin="normal"
-                value={confirmPassword}
+                value={confirmNewPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                autoFocus
-                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
-                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
-                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
               />
               {error && <Typography variant="body2" color="error">{error}</Typography>}
-              <Link to="/newPass" style={{ textDecoration: 'none' }}>
               <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: 20 }}>
                 Change Password
               </Button>
-              </Link>
             </form>
           </Paper>
         </Grid>
@@ -78,3 +82,4 @@ import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 }
 
 export default NewPassAfterOtp;
+

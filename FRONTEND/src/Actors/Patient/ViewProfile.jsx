@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-export default function ViewDoctor() {
+export default function ViewProfile() {
   const [userData, setUserData] = useState([]);
   const [error, setError] = useState([]);
   const navigate = useNavigate();

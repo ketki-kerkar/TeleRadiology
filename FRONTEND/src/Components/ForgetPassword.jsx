@@ -6,16 +6,16 @@ import Avatar from '@mui/material/Avatar';
 import LockResetIcon from '@mui/icons-material/LockReset';
 
 function ForgetPassword() {
-  const [emailId, setEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
   const handleResetPassword = async () => {
     try {
       // Call the backend API to check if the email exists
-      const response = await axios.post('http://localhost:9191/api/v1/patient/forgot-password', { emailId });
+      console.log('Email entered:', email); // Log the email entered
+      const response = await axios.post('http://localhost:9191/api/v1/forgot-password', { email });
       if (response.data.exists) {
-        // If email exists, navigate to the OTP generation page
-        // This part is different from the previous approach
+        // If email exists, navigate to the OTP generation page and pass the email as state
         setMessage('');
       } else {
         setMessage('Enter a valid email address.'); // Show error message
@@ -44,7 +44,7 @@ function ForgetPassword() {
                   variant="outlined"
                   type="email"
                   id="email"
-                  value={emailId}
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoFocus
@@ -58,18 +58,12 @@ function ForgetPassword() {
                 />
               </Grid>
               <Grid item xs={12}>
-                {/* Conditionally render Link based on whether the email exists */}
-                {message ? (
-                  <Button variant="contained" color="primary" disabled>
+                {/* Pass email as state to the OTPgen page */}
+                <Link to={{ pathname: "/otpGen", state: { email } }} style={{ textDecoration: 'none' }}>
+                  <Button variant="contained" color="primary" onClick={handleResetPassword}>
                     Reset Password
                   </Button>
-                ) : (
-                  <Link to="/otpGen" style={{ textDecoration: 'none' }}>
-                    <Button variant="contained" color="primary" onClick={handleResetPassword}>
-                      Reset Password
-                    </Button>
-                  </Link>
-                )}
+                </Link>
               </Grid>
             </Grid>
           </div>
