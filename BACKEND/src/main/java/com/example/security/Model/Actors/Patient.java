@@ -48,13 +48,6 @@ public class Patient {
     @Column(name = "history")
     private String history;
 
-    @Column(name = "otp_content")
-    private Integer otpContent;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "otp_generation_time")
-    private Timestamp otpGenerationTime;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
