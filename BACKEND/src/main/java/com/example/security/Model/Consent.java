@@ -41,6 +41,10 @@ public class Consent {
     private Doctor doctor;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "radiologist_id", nullable = true)
+    private Doctor radiologist;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "case_id", nullable = false)
     private Case cases;
 

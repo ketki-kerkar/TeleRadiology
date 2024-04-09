@@ -5,6 +5,7 @@ import com.example.security.DTOs.Requests.ConsentRequest;
 import com.example.security.services.doctor.ConsentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorController {
     private static final Logger logger = LoggerFactory.getLogger(DoctorController.class);
 
+    @Autowired
     private ConsentService consentservice;
     @PostMapping("/ask-consent")
     public ResponseEntity<String> askConsent(@RequestBody ConsentRequest request)//ConsentRequest is present in DTO->Request. For data that is passed in consent api body

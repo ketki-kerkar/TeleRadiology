@@ -6,6 +6,7 @@ import com.example.security.Model.Case;
 import com.example.security.Model.Consent;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.Repositories.CaseRepo;
+import com.example.security.Repositories.ConsentRepo;
 import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class ConsentService {
     @Autowired
     private DoctorRepo doctorRepo;
 
+    @Autowired
+    private ConsentRepo consentRepo;
+
     public ResponseEntity<String> askConsent(ConsentRequest request){
         Optional<Doctor> doctorOptional=doctorRepo.findById(request.getDoctorId());
         Optional<Case> caseOptional= caseRepo.findById(request.getCaseId());
@@ -43,9 +47,15 @@ public class ConsentService {
                     doctor(doctor).
                     cases(cases).
                     patient(patient).
+                    listOfRadiologistId(request.getListOfRadiologistId()).
                     timestampReceived(new Timestamp(System.currentTimeMillis())).
                     build();
+                 consentRepo.save(consent);
+            return ResponseEntity.ok("Consent sent successfully");
         }
+
+
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 }

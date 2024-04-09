@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,5 +16,6 @@ public class ConsentRequest {
     private Long caseId;
     private Long doctorId;
     private Long patientId;
+    private List<Long> listOfRadiologistId;
 
 }
