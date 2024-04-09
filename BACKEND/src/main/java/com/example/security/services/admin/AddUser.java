@@ -42,7 +42,7 @@ public class AddUser {
 
         userRepo.save(user);
 
-       Patient patient=Patient.builder().
+        Patient patient=Patient.builder().
                 name(request.getName()).
                 contact(request.getContact()).
                 bloodGroup(request.getBloodGroup()).

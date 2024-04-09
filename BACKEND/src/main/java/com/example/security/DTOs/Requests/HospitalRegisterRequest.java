@@ -13,6 +13,6 @@ public class HospitalRegisterRequest {
     private String email;
     private String password;
     @Builder.Default
-    private String role = "receptionist";
+    private String role = "receptionist"; // Set default value to "receptionist"
     private String hospitalName;
 }

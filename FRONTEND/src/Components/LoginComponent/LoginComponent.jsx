@@ -99,7 +99,7 @@ export default function SignInSide() {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <Avatar sx={{ m: 1, bgcolor: '#1976D2' }}>
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
@@ -117,6 +117,9 @@ export default function SignInSide() {
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
+                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
+                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
               />
               <TextField
                 margin="normal"
@@ -129,6 +132,10 @@ export default function SignInSide() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoFocus
+                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
+                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
+                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -150,7 +157,7 @@ export default function SignInSide() {
               )}
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2">
+                  <Link href="../ForgotPassword" variant="body2">
                     Forgot password?
                   </Link>
                 </Grid>

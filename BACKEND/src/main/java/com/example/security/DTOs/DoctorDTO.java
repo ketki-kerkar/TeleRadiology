@@ -21,7 +21,7 @@ public class DoctorDTO {
         if (dType != null && dType.equalsIgnoreCase("D")) {
             return "Doctor";
         } else if (dType != null && dType.equalsIgnoreCase("R")) {
-            return "Radiologists";
+            return "Radiologist";
         }
         return "";
     }

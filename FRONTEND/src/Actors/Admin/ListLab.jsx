@@ -33,7 +33,7 @@ export default function ListLab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/admin/listLabs');
+        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofLabs');
         setLabs(response.data); // Assuming the response data is an array of labs
       } catch (error) {
         console.error('Error fetching labs:', error);
@@ -64,14 +64,14 @@ export default function ListLab() {
             placeholder="Search by Lab ID" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
-            style={{ height:'40px', width: '300px', marginRight: '10px' }} 
+            style={{ height:'40px', width: '300px', marginRight: '10px', borderRadius:'3px'}} 
           />
-          <Button variant="contained" onClick={handleSearch} style={{ Width: '25px', height: '40px', backgroundColor: '#7FDEFF', color: '#000000' }}>
+          <Button variant="contained" onClick={handleSearch} style={{ Width: '25px', height: '40px', backgroundColor: '#1976d2', color: '#fff', borderRadius:'3px' }}>
             <SearchIcon />
           </Button>
         </div>
         <Link to="./addlab" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" style={{ backgroundColor: '#7FDEFF',color: '#000000',height:'40px' }}>
+          <Button variant="contained" style={{ backgroundColor: '#1976d2', color: '#fff',height:'40px' }}>
             Add Lab
           </Button>
         </Link>
@@ -82,11 +82,9 @@ export default function ListLab() {
             <TableHead>
               <TableRow>
                 <StyledTableCell>S.No.</StyledTableCell>
-                <StyledTableCell align="right">LAB ID</StyledTableCell>
-                <StyledTableCell align="right">LAB NAME</StyledTableCell>
-                <StyledTableCell align="right">EMAIL</StyledTableCell>
-                <StyledTableCell align="right">CONTACT</StyledTableCell>
-                <StyledTableCell align="right">ACTIONS</StyledTableCell> 
+                <StyledTableCell align="left">LAB NAME</StyledTableCell>
+                <StyledTableCell align="left">EMAIL</StyledTableCell>
+                <StyledTableCell align="left">ACTIONS</StyledTableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
@@ -95,11 +93,9 @@ export default function ListLab() {
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
-                  <StyledTableCell align="right">{lab.id}</StyledTableCell>
-                  <StyledTableCell align="right">{lab.name}</StyledTableCell>
-                  <StyledTableCell align="right">{lab.email}</StyledTableCell>
-                  <StyledTableCell align="right">{lab.contact}</StyledTableCell>
-                  <StyledTableCell align="right">
+                  <StyledTableCell align="left">{lab.labName}</StyledTableCell>
+                  <StyledTableCell align="left">{lab.email}</StyledTableCell>
+                  <StyledTableCell align="left">
                     <Button variant="contained" color="primary" onClick={() => handleViewDetails(lab.id)}>
                       View
                     </Button>

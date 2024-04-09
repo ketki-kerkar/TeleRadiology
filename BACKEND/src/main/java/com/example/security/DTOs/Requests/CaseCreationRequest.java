@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class CaseCreationRequest {
-    private Long patientId;
-    private Long doctorId;
+    private String patientEmail;
+    private String doctorEmail;
 }

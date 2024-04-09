@@ -27,9 +27,9 @@ public class DoctorController {
             logger.info("Consent sent successfully");
             return new ResponseEntity<>("Consent sent successfully", HttpStatus.CREATED);
         }catch(Exception e){
-        logger.error("Error in sending consent: {}", e.getMessage());
-        return new ResponseEntity<>("Failed to send consent", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
+            logger.error("Error in sending consent: {}", e.getMessage());
+            return new ResponseEntity<>("Failed to send consent", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 

@@ -1,19 +1,19 @@
-import {useState, React} from "react";
+import React, { useState } from "react";
 import { styled } from '@mui/system';
-import { FormControlLabel, InputLabel, Button, CssBaseline, TextField, FormControl, RadioGroup, Radio, Grid, Typography, Container, Select, MenuItem, Checkbox } from '@mui/material';
+import { FormControlLabel, InputLabel, Button, CssBaseline, TextField, FormControl, RadioGroup, Radio, Grid, Typography, Container, Select, MenuItem, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from "../../Components/Navbar";
-import axios from 'axios'; 
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
     secondary: {
       main: '#F7FBFF',
+    
     },
   },
 });
-
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(8),
@@ -22,104 +22,108 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   alignItems: "center",
 }));
 
-
 const StyledForm = styled('form')(({ theme }) => ({
-  width: "65vw",
+  width: "55vw",
   marginTop: theme.spacing(3)
 }));
 
 export default function AddPatient() {
-    
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");const [nameError, setNameError] = useState(false);
-    const [gender, setGender] = useState("");
-    const [contact, setContact] = useState("");
-    const [email, setEmail] = useState("");const [emailError, setEmailError] = useState(false);
-    const [dob, setDOB] = useState("");
-    const [bloodGroup, setbloodGroup] = useState("");
-    const [address, setaddress] = useState("");
-    const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nameError, setNameError] = useState(false);
+  const [gender, setGender] = useState("");
+  const [contact, setContact] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(false);
+  const [dob, setDOB] = useState("");
+  const [bloodGroup, setbloodGroup] = useState("");
+  const [address, setaddress] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handlefNameChange = (event) => {
-      const value = event.target.value;
-      setFirstName(value);
-      setNameError(value.length < 3); // Set error if name is less than or equal to 3 characters
-    };
-    const handlelNameChange = (event) => {
-      const value = event.target.value;
-      setLastName(value);
-      setNameError(value.length < 3); // Set error if name is less than or equal to 3 characters
-    };
-    const handleContactChange = (event) => {
-        let value = event.target.value;
-        value = value.replace(/\D/g, "");
-        value = value.slice(0, 10);
-        setContact(value);
-      };
+  const handlefNameChange = (event) => {
+    const value = event.target.value;
+    setFirstName(value);
+    setNameError(value.length < 3);
+  };
 
-    const validateEmail = (email) => {
-        // Regular expression for validating email
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    };
+  const handlelNameChange = (event) => {
+    const value = event.target.value;
+    setLastName(value);
+    setNameError(value.length < 3);
+  };
 
-    const handleEmailChange = (event) => {
-        const value = event.target.value;
-        setEmail(value);
-        setEmailError(!validateEmail(value)); // Set error if email is invalid
-    };
+  const handleContactChange = (event) => {
+    let value = event.target.value;
+    value = value.replace(/\D/g, "");
+    value = value.slice(0, 10);
+    setContact(value);
+  };
 
-    const handleDOBChange = (event) => {
-        setDOB(event.target.value);
-    };
-    const handleGenderChange = (event) => {
-        setGender(event.target.value);
-    };
-    
-    const handlebloodGroupChange = (event) =>{
-        setbloodGroup(event.target.value);
-    };
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
-    const handleAddressChange = (event) => {
-        setaddress(event.target.value);
-    };
-   
-    const [labelClicked, setLabelClicked] = useState(false);
+  const handleEmailChange = (event) => {
+    const value = event.target.value;
+    setEmail(value);
+    setEmailError(!validateEmail(value));
+  };
 
-    const handleLabelClick = () => {
-        setLabelClicked(true);
-    };
+  const handleDOBChange = (event) => {
+    setDOB(event.target.value);
+  };
 
-    
-    
-    const handleSubmit = () => {
-        const formData = {
-        firstName: firstName,
-        lastName: lastName,
-        gender:gender,
-        email: email,
-        DOB: dob,
-        };
-        axios.post('http://localhost:9191/api/v1/receptionist/add-patient', formData)
+  const handleGenderChange = (event) => {
+    setGender(event.target.value);
+  };
+
+  const handlebloodGroupChange = (event) => {
+    setbloodGroup(event.target.value);
+  };
+
+  const handleAddressChange = (event) => {
+    setaddress(event.target.value);
+  };
+
+  const [labelClicked, setLabelClicked] = useState(false);
+
+  const handleLabelClick = () => {
+    setLabelClicked(true);
+  };
+
+  const handleSubmit = () => {
+    setSubmitting(true);
+    const formData = {
+      name: `${firstName} ${lastName}`,
+      dateOfBirth: dob,
+      gender: gender,
+      bloodGroup: bloodGroup,
+      contact: contact,
+      address: address,
+      emailId: email,
+    };
+    axios.post('http://localhost:9191/api/v1/receptionist/register', formData)
       .then(response => {
-        console.log(response.data);
-        // Set registrationSuccess to true
-        setRegistrationSuccess(true);
-        // Redirect to homepage after 2 seconds
-        setTimeout(() => {
-          navigate('/admin'); // Replace '/' with the URL of your homepage
-        }, 2000);
+        setSubmitting(false);
+        setOpenDialog(true);
       })
       .catch(error => {
         console.error('Error:', error);
+        setSubmitting(false);
       });
-    }
-  
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    navigate('/receptionist');
+  };
   return (
     <ThemeProvider theme={theme}>
-      <body style={{backgroundColor: '#F7FBFF', margin: 0, padding: 0}}>
+
         <Navbar userRole="receptionist"/>
     <StyledContainer component="main" maxWidth="xs">
       <CssBaseline />
@@ -298,27 +302,40 @@ export default function AddPatient() {
                 control={<Checkbox value="remember" color="primary" />}
                 label="By checking this box, I indicate my acceptance of these terms and conditions and consent to the use of this healthcare app in accordance with its policies."
               />
-            </Grid>
-
-            
+            </Grid>  
           </Grid>
-          {registrationSuccess && (
-          <Typography variant="body1" color="primary" align="center">
-            Registration successful! Redirecting to homepage...
-          </Typography>
-          )}
-          <Button onClick={handleSubmit}
-            variant="contained"
-            style={{ borderRadius:'5px',position: 'fixed',height:'5.8vh',width:'15vw',marginTop:'15px',right:'17.5vw',backgroundColor: '#7fdeff',color:'#000',fontFamily: 'Quicksand, sans-serif',
-            fontSize: '1vw' }}
-          >
-            Submit
-          </Button>
+          <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              style={{ marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }}
+              disabled={submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? 'Submitting...' : 'Submit'}
+            </Button>
   
         </StyledForm>
       </div>
     </StyledContainer>
-    </body>
+    <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Registration Successful</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Your registration has been successful. Redirecting to homepage...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }

@@ -33,7 +33,7 @@ export default function ListReceptionist() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/admin/listReceptionists');
+        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofHospitals');
         setReceptionists(response.data); // Assuming the response data is an array of receptionists
       } catch (error) {
         console.error('Error fetching receptionists:', error);
@@ -65,14 +65,14 @@ export default function ListReceptionist() {
             placeholder="Search by Receptionist ID" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
-            style={{ height:'40px', width: '300px', marginRight: '10px' }} 
+            style={{ height:'40px', width: '300px', marginRight: '10px',borderRadius:'3px' }} 
           />
-          <Button variant="contained" onClick={handleSearch} style={{ Width: '25px', height: '40px', backgroundColor: '#7FDEFF', color: '#000000' }}>
+          <Button variant="contained" onClick={handleSearch} style={{ Width: '25px', height: '40px', backgroundColor: '#1976d2', color: '#fff' ,borderRadius:'3px' }}>
             <SearchIcon />
           </Button>
         </div>
         <Link to="./addreceptionist" style={{ textDecoration: 'none', height:'40px'}}>
-          <Button variant="contained" style={{ backgroundColor: '#7FDEFF', color: '#000000' }}>
+          <Button variant="contained" style={{ backgroundColor: '#1976d2', color: '#fff'}}>
             Add Receptionist
           </Button>
         </Link>
@@ -83,11 +83,10 @@ export default function ListReceptionist() {
             <TableHead>
               <TableRow>
                 <StyledTableCell>S.No.</StyledTableCell>
-                <StyledTableCell align="right">RECEPTIONIST ID</StyledTableCell>
-                <StyledTableCell align="right">RECEPTIONIST NAME</StyledTableCell>
-                <StyledTableCell align="right">GENDER</StyledTableCell>
-                <StyledTableCell align="right">EMAIL</StyledTableCell>
-                <StyledTableCell align="right">ACTIONS</StyledTableCell> {/* New column for actions */}
+                <StyledTableCell align="left">RECEPTIONIST ID</StyledTableCell>
+                <StyledTableCell align="left">RECEPTIONIST NAME</StyledTableCell>
+                <StyledTableCell align="left">EMAIL</StyledTableCell>
+                <StyledTableCell align="left">ACTIONS</StyledTableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
@@ -96,10 +95,9 @@ export default function ListReceptionist() {
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
-                  <StyledTableCell align="right">{receptionist.id}</StyledTableCell>
-                  <StyledTableCell align="right">{receptionist.name}</StyledTableCell>
-                  <StyledTableCell align="right">{receptionist.gender}</StyledTableCell>
-                  <StyledTableCell align="right">{receptionist.email}</StyledTableCell>
+                  <StyledTableCell align="left">{receptionist.hospitalId}</StyledTableCell>
+                  <StyledTableCell align="left">{receptionist.hospitalName}</StyledTableCell>
+                  <StyledTableCell align="left">{receptionist.hospitalEmail}</StyledTableCell>
                   <StyledTableCell align="right">
                     <Button variant="contained" color="primary" onClick={() => handleViewDetails(receptionist.id)}>
                       View

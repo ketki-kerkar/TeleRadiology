@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -26,8 +27,18 @@ public class User implements UserDetails {
     private UUID userId;
 
     private String email;
+
     private String password;
+
     private boolean IsDisabled;
+
+    @Column(name = "otp_content")
+    private Integer otpContent;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "otp_generation_time")
+    private Timestamp otpGenerationTime;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
