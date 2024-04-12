@@ -1,10 +1,9 @@
-// NewPassAfterOtp.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Paper, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import { useLocation } from 'react-router-dom';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
-import axios from 'axios'; // Import Axios for making HTTP requests
+import axios from 'axios';
 
 function NewPassAfterOtp() {
   const [newPassword, setNewPassword] = useState('');
@@ -13,11 +12,25 @@ function NewPassAfterOtp() {
 
   // Extract email and OTP from query parameters using useLocation hook
   const location = useLocation();
-  const { email, otp } = location.state || {};
+  const { email } = location.state || {};
+  const { otp } = location.state || {};
+
+
+  useEffect(() => {
+    console.log('email:', email);
+    console.log('otp:', otp);
+  }, []);
+
+  
+  // useEffect(() => {
+  //   console.log('Email:', email);
+  //   console.log('OTP:', otptopass);
+  // }, [email, otptopass]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate form data
+    console.log("uiuiuiuiiu",newPassword, confirmNewPassword);
     if (newPassword !== confirmNewPassword) {
       setError("Passwords don't match");
       return;
@@ -51,7 +64,7 @@ function NewPassAfterOtp() {
             <Typography variant="h5" gutterBottom>
               Change Password
             </Typography>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => handleSubmit(e)}>
               <TextField
                 label="New Password"
                 type="password"
