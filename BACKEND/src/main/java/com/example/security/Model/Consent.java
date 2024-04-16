@@ -48,9 +48,12 @@ public class Consent {
     @JoinColumn(name = "case_id", nullable = false)
     private Case cases;
 
-    @Column
+   /* @Column
     @ElementCollection//Annotation used in JPA to map collection of elements to a database table
-    private List<Long> listOfRadiologistId;
+    private List<Long> listOfRadiologistId;*/
+
+    @Column
+    private String listOfRadiologistId;
 
 
 

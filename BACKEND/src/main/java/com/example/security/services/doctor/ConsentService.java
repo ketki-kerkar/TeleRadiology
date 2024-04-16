@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.example.security.converter.LongListConverter;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -40,14 +40,15 @@ public class ConsentService {
             Doctor doctor = doctorOptional.get();
             Case cases=caseOptional.get();
             Patient patient=patientOptional.get();
-
+            LongListConverter converter = new LongListConverter();
+            String listofRadiologist= converter.convertToDatabaseColumn(request.getListOfRadiologistId());
 
             Consent consent = Consent.builder().
                     consentStatus("pending").
                     doctor(doctor).
                     cases(cases).
                     patient(patient).
-                    listOfRadiologistId(request.getListOfRadiologistId()).
+                    listOfRadiologistId(listofRadiologist).
                     timestampReceived(new Timestamp(System.currentTimeMillis())).
                     build();
                  consentRepo.save(consent);

@@ -2,7 +2,9 @@ package com.example.security.auth;
 
 import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.DTOs.Requests.ConsentRequest;
+import com.example.security.DTOs.Requests.PrescriptionRequest;
 import com.example.security.services.doctor.ConsentService;
+import com.example.security.services.doctor.PrescriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorController {
     private static final Logger logger = LoggerFactory.getLogger(DoctorController.class);
 
+
     @Autowired
     private ConsentService consentservice;
+
+    @Autowired
+    private PrescriptionService prescriptionService;
+
+    @PostMapping("/add-prescription")
+    public ResponseEntity<String> AddPrescription(@RequestBody PrescriptionRequest request){
+        try {
+            logger.info("Received request to add Prescription: {}", request);
+            prescriptionService.addPrescription(request);
+            logger.info("Prescription added successfully");
+            return new ResponseEntity<>("Prescription added successfully", HttpStatus.OK);
+        }catch(Exception e){
+            logger.error("Error in adding prescription: {}", e.getMessage());
+            return new ResponseEntity<>("Failed to add prescription", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
     @PostMapping("/ask-consent")
     public ResponseEntity<String> askConsent(@RequestBody ConsentRequest request)//ConsentRequest is present in DTO->Request. For data that is passed in consent api body
     {
