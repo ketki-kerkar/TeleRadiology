@@ -21,7 +21,7 @@ public class Case {
     @Column(name = "case_id", nullable = false, updatable = false)
     private Long caseId;
 
-    @Column(name = "case_summary")
+    @Column(name = "case_summary",columnDefinition = "TEXT")
     private String caseSummary;
 
     @Column(name = "case_status", nullable = false)

@@ -1,8 +1,10 @@
 package com.example.security.auth;
 
 import com.example.security.DTOs.Requests.AuthenticationResponse;
+import com.example.security.DTOs.Requests.CaseSummaryRequest;
 import com.example.security.DTOs.Requests.ConsentRequest;
 import com.example.security.DTOs.Requests.PrescriptionRequest;
+import com.example.security.services.doctor.CaseSummaryService;
 import com.example.security.services.doctor.ConsentService;
 import com.example.security.services.doctor.PrescriptionService;
 import org.slf4j.Logger;
@@ -10,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/doctor")
@@ -26,7 +25,23 @@ public class DoctorController {
 
     @Autowired
     private PrescriptionService prescriptionService;
+    @Autowired
+    private CaseSummaryService caseSummaryService;
 
+
+    @PutMapping("/add-case-summary")
+    public ResponseEntity<String> AddCaseSummary(@RequestBody CaseSummaryRequest request){
+        try {
+            logger.info("Received request to add caseSummary: {}", request);
+            caseSummaryService.addcaseSummary(request);
+            logger.info("Case Summary added successfully");
+            return new ResponseEntity<>("Case Summary added successfully", HttpStatus.OK);
+        }catch(Exception e){
+            logger.error("Error in adding case Summary: {}", e.getMessage());
+            return new ResponseEntity<>("Failed to add case summary", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
     @PostMapping("/add-prescription")
     public ResponseEntity<String> AddPrescription(@RequestBody PrescriptionRequest request){
         try {
