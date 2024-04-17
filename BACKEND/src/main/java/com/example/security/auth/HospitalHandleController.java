@@ -2,12 +2,14 @@ package com.example.security.auth;
 
 import com.example.security.DTOs.DoctorByHospitalDTO;
 import com.example.security.DTOs.PatientDTO;
-import com.example.security.DTOs.Requests.AuthenticationResponse;
-import com.example.security.DTOs.Requests.CaseCreationRequest;
-import com.example.security.DTOs.Requests.DoctorRegisterRequest;
-import com.example.security.DTOs.Requests.PatientRegistrationRequest;
+import com.example.security.DTOs.Requests.*;
+import com.example.security.DTOs.UserDTO;
 import com.example.security.Model.Actors.Patient;
+import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
+import com.example.security.services.admin.FindUser;
+import com.example.security.services.admin.ListUser;
 import com.example.security.services.hospitalHandle.ListDoctor;
 import com.example.security.services.hospitalHandle.PatientRegistrationService;
 import com.example.security.services.hospitalHandle.ViewPatient;
@@ -44,42 +46,71 @@ public class HospitalHandleController {
     @Autowired
     private JwtService jwtService;
 
-    /* @PostMapping("/registerPatient")
-     public ResponseEntity<String> registerPatient(@RequestBody Patient patient) {
-         try {
-             logger.info("Received request to register patient: {}", patient);
-             patientRegistrationService.registerPatient(patient);
-             logger.info("Patient registration completed successfully");
-             return new ResponseEntity<>("Patient registered successfully", HttpStatus.CREATED);
-         } catch (Exception e) {
-             logger.error("Error registering patient: {}", e.getMessage());
-             return new ResponseEntity<>("Failed to register patient", HttpStatus.INTERNAL_SERVER_ERROR);
-         }
-     }*/
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private FindUser findUser;
+
+    @Autowired
+    private ListUser listUser;
+
     @PostMapping("/add-patient")
     public ResponseEntity<AuthenticationResponse> registerPatient(
+            @RequestHeader(name = "Authorization") String token,
             @RequestBody PatientRegistrationRequest request
     ){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"receptionist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         return ResponseEntity.ok(addUser.registerPatient(request));
     }
 
-    @GetMapping("/viewPatients")
-    public ResponseEntity<List<PatientDTO>> getAllPatient() {
-        List<PatientDTO> patientDTOs = viewPatient.getAllPatient()
+    @GetMapping("/viewList/ofPatients")
+    public ResponseEntity<List<PatientDTO>> getAllPatient(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"receptionist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<PatientDTO> patientDTOs = listUser.getAllPatient()
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(patientDTOs);
     }
     private PatientDTO convertToDTO(Patient patient) {
-        return PatientDTO.builder()
-                .patientId(patient.getPatientId())
-                .name(patient.getName())
-                .build();
+        PatientDTO dto = new PatientDTO();
+        dto.setName(patient.getName());
+        dto.setEmail(patient.getUser().getEmail());
+        dto.setAge(patient.getAge());
+        dto.setAddress(patient.getAddress());
+        dto.setContact(patient.getContact());
+        dto.setGender(patient.getGender());
+        dto.setDateOfRegistration(patient.getDateOfRegistration());
+        return dto;
     }
 
     @PostMapping("/cases")
-    public ResponseEntity<String> createCase(@RequestBody CaseCreationRequest request) {
+    public ResponseEntity<String> createCase(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody CaseCreationRequest request) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body("Invalid token");
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"receptionist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body("User does not have privileges");
+        }
         caseService.createCase(request.getPatientEmail(), request.getDoctorEmail());
         return ResponseEntity.ok("Case created successfully");
     }
@@ -90,12 +121,36 @@ public class HospitalHandleController {
         if (userEmail == null) {
             return ResponseEntity.badRequest().body(null);
         }
-
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"receptionist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         List<DoctorByHospitalDTO> doctors = listDoctor.getDoctorsByHospital(userEmail)
                 .stream()
                 .map(doctor -> new DoctorByHospitalDTO(doctor.getDName(), doctor.getUser().getEmail()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(doctors);
+    }
+
+    @PostMapping("/findUser/ByEmail")
+    public ResponseEntity<UserDTO> getUserEntitiesByEmail(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody EmailRequest emailRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"receptionist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            String email = emailRequest.getEmail();
+            ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
+            return response;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

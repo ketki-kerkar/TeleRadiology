@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class DoctorController {
     private static final Logger logger = LoggerFactory.getLogger(DoctorController.class);
 
-
     @Autowired
     private ConsentService consentservice;
 
@@ -56,7 +55,6 @@ public class DoctorController {
 
     }
 
-
     @PostMapping("/ask-consent")
     public ResponseEntity<String> askConsent(@RequestBody ConsentRequest request)//ConsentRequest is present in DTO->Request. For data that is passed in consent api body
     {
@@ -69,7 +67,5 @@ public class DoctorController {
             logger.error("Error in sending consent: {}", e.getMessage());
             return new ResponseEntity<>("Failed to send consent", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
-
 }

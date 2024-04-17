@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface PatientRepo extends JpaRepository<Patient, Long>{
     List<Patient> findAll();
     Optional<Patient> findByUserEmail(String emailId);
+    List<Patient> findByUserUserId(UUID userId);
 }

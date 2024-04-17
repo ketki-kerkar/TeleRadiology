@@ -6,10 +6,13 @@ import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Actors.HospitalHandle;
 import com.example.security.Model.Actors.Lab;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
+import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.DeleteUser;
 import com.example.security.services.admin.FindUser;
 import com.example.security.services.admin.ListUser;
+import com.example.security.services.login.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,29 +35,69 @@ public class AdminController {
     @Autowired
     private final DeleteUser deleteUser;
 
+    private final JwtService jwtService;
+    private final UserRepo userRepo;
+
     @PostMapping("/add-doctor")
     public ResponseEntity<AuthenticationResponse> registerDoctor(
+            @RequestHeader(name = "Authorization") String token,
             @RequestBody DoctorRegisterRequest request
     ){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // Only admin can access this endpoint
         return ResponseEntity.ok(addUser.registerDoctor(request));
     }
 
     @PostMapping("/add-receptionist")
     public ResponseEntity<AuthenticationResponse> registerHospital(
+            @RequestHeader(name = "Authorization") String token,
             @RequestBody HospitalRegisterRequest request
     ){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         return ResponseEntity.ok(addUser.registerHospital(request));
     }
 
     @PostMapping("/add-lab")
     public ResponseEntity<AuthenticationResponse> registerLab(
+            @RequestHeader(name = "Authorization") String token,
             @RequestBody LabRegisterRequest request
     ){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         return ResponseEntity.ok(addUser.registerLab(request));
     }
 
     @GetMapping("/viewList/ofHospitals")
-    public ResponseEntity<List<HospitalHandleDTO>> getAllHospitalHandles() {
+    public ResponseEntity<List<HospitalHandleDTO>> getAllHospitalHandles(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         List<HospitalHandleDTO> hospitalHandleDTOs = listUser.getAllHospitalHandles()
                 .stream()
                 .map(this::convertToDTO)
@@ -69,7 +112,15 @@ public class AdminController {
     }
 
     @GetMapping("/viewList/ofLabs")
-    public ResponseEntity<List<LabDTO>> getAllLab() {
+    public ResponseEntity<List<LabDTO>> getAllLab(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         List<LabDTO> labDTOs = listUser.getAllLab()
                 .stream()
                 .map(this::convertToDTO)
@@ -84,7 +135,15 @@ public class AdminController {
     }
 
     @GetMapping("/viewList/ofDoctors")
-    public ResponseEntity<List<DoctorDTO>> getAllDoctor() {
+    public ResponseEntity<List<DoctorDTO>> getAllDoctor(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         List<DoctorDTO> doctorDTOs = listUser.getAllDoctor()
                 .stream()
                 .map(this::convertToDTO)
@@ -100,7 +159,17 @@ public class AdminController {
     }
 
     @PostMapping("/findUser/ByEmail")
-    public ResponseEntity<UserDTO> getUserEntitiesByEmail(@RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<UserDTO> getUserEntitiesByEmail(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody EmailRequest emailRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             String email = emailRequest.getEmail();
             ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);

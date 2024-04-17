@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -13,8 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatientDTO {
-    private Long patientId;
     private String name;
+    private String email;
     private int age;
     private String address;
     private String contact;

@@ -1,17 +1,8 @@
 package com.example.security.services.admin;
 
-import com.example.security.Model.Actors.Doctor;
-import com.example.security.Model.Actors.HospitalHandle;
-import com.example.security.Model.Actors.Lab;
-import com.example.security.Model.Actors.User;
-import com.example.security.Repositories.DoctorRepo;
-import com.example.security.Repositories.HospitalHandleRepo;
-import com.example.security.Repositories.LabRepo;
-import com.example.security.Repositories.UserRepo;
-import com.example.security.DTOs.UserDTO;
-import com.example.security.DTOs.DoctorDTO;
-import com.example.security.DTOs.HospitalHandleDTO;
-import com.example.security.DTOs.LabDTO;
+import com.example.security.DTOs.*;
+import com.example.security.Model.Actors.*;
+import com.example.security.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +24,8 @@ public class FindUser {
     private LabRepo labRepo;
     @Autowired
     private DoctorRepo doctorRepo;
+    @Autowired
+    private PatientRepo patientRepo ;
 
     public ResponseEntity<UserDTO> findUserEntitiesByEmail(String email) {
         Optional<User> userOptional = userRepo.findByEmail(email);
@@ -41,7 +34,8 @@ public class FindUser {
             List<HospitalHandleDTO> hospitalHandles = findHospitalHandlesByUserId(userId);
             List<LabDTO> labs = findLabsByUserId(userId);
             List<DoctorDTO> doctors = findDoctorsByUserId(userId);
-            UserDTO userDTO = new UserDTO(email, hospitalHandles, labs, doctors);
+            List<PatientDTO> patients = findPatientsByUserId(userId);
+            UserDTO userDTO = new UserDTO(email, hospitalHandles, labs, doctors, patients);
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -79,6 +73,23 @@ public class FindUser {
                             d.getHospital().getHospitalName(),
                             d.getDepartment(),
                             d.getQualification()))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    private List<PatientDTO> findPatientsByUserId(UUID userId) {
+        List<Patient> patients = patientRepo.findByUserUserId(userId);
+        if (patients != null) {
+            return patients.stream()
+                    .map(p -> new PatientDTO(
+                            p.getName(),
+                            p.getUser().getEmail(),
+                            p.getAge(),
+                            p.getAddress(),
+                            p.getContact(),
+                            p.getGender(),
+                            p.getDateOfRegistration()))
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
