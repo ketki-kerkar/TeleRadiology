@@ -29,13 +29,18 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 
 export default function ViewDoctors() {
+  const authToken = localStorage.getItem('authToken');
+
   const [doctors, setDoctors] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofDoctors');
+        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofDoctors', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }});
         setDoctors(response.data);
       } catch (error) {
         console.error('Error fetching doctors:', error);
@@ -44,7 +49,7 @@ export default function ViewDoctors() {
     };
   
     fetchData();
-  }, []);
+  }, [authToken]);
 
   const handleViewDetails = (doctorId) => {
     console.log("Viewing details of doctor with ID:", doctorId);
@@ -52,7 +57,7 @@ export default function ViewDoctors() {
   };
 
   const handleSearch = () => {
-    const filteredDoctors = doctors.filter(doctor => doctor.doctorId.includes(searchQuery));
+    const filteredDoctors = doctors.filter(doctor => doctor.dname.includes(searchQuery));
     setDoctors(filteredDoctors);
   };
 
@@ -64,7 +69,7 @@ export default function ViewDoctors() {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="Search by Doctor ID" 
+            placeholder="Search by Doctor Name" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
             style={{ height:'40px', width: '300px', marginRight: '10px', borderRadius:'3px'}} 

@@ -27,13 +27,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListLab() {
+  const authToken = localStorage.getItem('authToken');
   const [labs, setLabs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofLabs');
+        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofLabs',{
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }});
         setLabs(response.data); // Assuming the response data is an array of labs
       } catch (error) {
         console.error('Error fetching labs:', error);
@@ -41,7 +45,7 @@ export default function ListLab() {
     };
 
     fetchData();
-  }, []);
+  }, [authToken]);
 
   const handleViewDetails = (labId) => {
     // Handle viewing details of the lab here

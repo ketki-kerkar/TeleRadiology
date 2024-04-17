@@ -27,13 +27,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListReceptionist() {
+  const authToken = localStorage.getItem('authToken');
   const [receptionists, setReceptionists] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofHospitals');
+        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofHospitals',{
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }});
         setReceptionists(response.data); // Assuming the response data is an array of receptionists
       } catch (error) {
         console.error('Error fetching receptionists:', error);
@@ -41,7 +45,7 @@ export default function ListReceptionist() {
     };
 
     fetchData();
-  }, []);
+  }, [authToken]);
 
   const handleViewDetails = (receptionistId) => {
     // Handle viewing details of the receptionist here
@@ -83,7 +87,6 @@ export default function ListReceptionist() {
             <TableHead>
               <TableRow>
                 <StyledTableCell>S.No.</StyledTableCell>
-                <StyledTableCell align="left">RECEPTIONIST ID</StyledTableCell>
                 <StyledTableCell align="left">RECEPTIONIST NAME</StyledTableCell>
                 <StyledTableCell align="left">EMAIL</StyledTableCell>
                 <StyledTableCell align="left">ACTIONS</StyledTableCell> 
@@ -95,10 +98,9 @@ export default function ListReceptionist() {
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
-                  <StyledTableCell align="left">{receptionist.hospitalId}</StyledTableCell>
                   <StyledTableCell align="left">{receptionist.hospitalName}</StyledTableCell>
-                  <StyledTableCell align="left">{receptionist.hospitalEmail}</StyledTableCell>
-                  <StyledTableCell align="right">
+                  <StyledTableCell align="left">{receptionist.email}</StyledTableCell>
+                  <StyledTableCell align="left">
                     <Button variant="contained" color="primary" onClick={() => handleViewDetails(receptionist.id)}>
                       View
                     </Button>

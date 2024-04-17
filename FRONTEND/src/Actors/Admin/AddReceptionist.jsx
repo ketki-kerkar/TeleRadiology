@@ -27,6 +27,8 @@ const StyledForm = styled('form')(({ theme }) => ({
 }));
 
 export default function AddReceptionist() {
+  const authToken = localStorage.getItem('authToken');
+
   const [hospitalName, setHospitalName] = useState("");
   const [nameError, setNameError] = useState(false);
   const [email, setEmail] = useState("");
@@ -63,7 +65,10 @@ export default function AddReceptionist() {
       hospitalName: hospitalName,
       email: email,
     };
-    axios.post('http://localhost:9191/api/v1/admin/add-receptionist', formData)
+    axios.post('http://localhost:9191/api/v1/admin/add-receptionist', formData, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }})
       .then(response => {
         setSubmitting(false);
         setOpenDialog(true);
@@ -168,5 +173,3 @@ export default function AddReceptionist() {
     </ThemeProvider>
   );
 }
-
-        
