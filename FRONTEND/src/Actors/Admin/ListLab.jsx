@@ -47,10 +47,6 @@ export default function ListLab() {
     fetchData();
   }, [authToken]);
 
-  const handleViewDetails = (labId) => {
-    // Handle viewing details of the lab here
-    console.log("Viewing details of lab with ID:", labId);
-  };
 
   const handleSearch = () => {
     const filteredLabs = labs.filter(lab => lab.id.includes(searchQuery));
@@ -93,16 +89,18 @@ export default function ListLab() {
             </TableHead>
             <TableBody>
               {labs.map((lab, index) => (
-                <StyledTableRow key={lab.id}>
+                <StyledTableRow key={lab.email}>
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
                   <StyledTableCell align="left">{lab.labName}</StyledTableCell>
                   <StyledTableCell align="left">{lab.email}</StyledTableCell>
                   <StyledTableCell align="left">
-                    <Button variant="contained" color="primary" onClick={() => handleViewDetails(lab.id)}>
-                      View
-                    </Button>
+                  <Link to={{ pathname:'/admin/listLab/viewLab', search: `?email=${lab.email}` }} style={{ textDecoration: 'none', color: '#fff' }}>
+                      <Button variant="contained" style={{ backgroundColor: '#1976d2' }}>
+                        View
+                      </Button>
+                  </Link>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}

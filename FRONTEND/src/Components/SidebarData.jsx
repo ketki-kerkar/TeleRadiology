@@ -8,7 +8,6 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import PeopleIcon from '@mui/icons-material/People';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import LogoutIcon from '@mui/icons-material/Logout';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import './Navbar.css';
 
@@ -51,12 +50,6 @@ export const SidebarData = {
       icon: <LockOpenIcon/>,
       cName: 'nav-text'
     },
-    {
-      title: 'Logout',
-      path: '/',
-      icon: <LogoutIcon className="icon-hover"/>,
-      cName: 'nav-text'
-    },
   ],
   doctor: [
     {
@@ -79,7 +72,7 @@ export const SidebarData = {
     },
     {
       title: 'Reports',
-      path: '/doctor/',
+      path: '/doctor',
       icon: <ReceiptIcon/>,
       cName: 'nav-text'
     },
@@ -93,12 +86,6 @@ export const SidebarData = {
       title: 'Change Password',
       path: '/doctor/changePassword',
       icon: <LockOpenIcon/>,
-      cName: 'nav-text'
-    },
-    {
-      title: 'Logout',
-      path: '/',
-      icon: <LogoutIcon className="icon-hover" />,
       cName: 'nav-text'
     },
   ],
@@ -119,12 +106,6 @@ export const SidebarData = {
       title: 'Change Password',
       path: '/admin/changePassword',
       icon: <LockOpenIcon/>,
-      cName: 'nav-text'
-    },
-    {
-      title: 'Logout',
-      path: '/',
-      icon: <LogoutIcon className="icon-hover" />,
       cName: 'nav-text'
     },
   ],
@@ -179,13 +160,6 @@ export const SidebarData = {
       icon: <LockOpenIcon/>,
       cName: 'nav-text'
     },
-    {
-      title: 'Logout',
-      path: '/',
-      icon: <LogoutIcon className="icon-hover" />,
-      cName: 'nav-text'
-    },
+    
   ]
 };
-
-
