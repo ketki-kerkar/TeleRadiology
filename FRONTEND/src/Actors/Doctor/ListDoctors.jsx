@@ -10,7 +10,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import StyledTableRow from '@mui/material/TableRow';
 import { CssBaseline } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
@@ -26,13 +25,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ViewDoctors() {
+  const authToken = localStorage.getItem('authToken');
   const [doctors, setDoctors] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofDoctors');
+        const response = await axios.get('http://localhost:9191/api/v1/doctor/viewList/ofDoctors',  {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }});
         setDoctors(response.data);
       } catch (error) {
         console.error('Error fetching doctors:', error);
@@ -40,15 +43,15 @@ export default function ViewDoctors() {
     };
 
     fetchData();
-  }, []);
-
+  }, [authToken]);
   const handleViewDetails = (doctorId) => {
     console.log("Viewing details of doctor with ID:", doctorId);
-    // Add your logic for viewing details of the doctor here
+    // Implement logic to view details
   };
 
+
   const handleSearch = () => {
-    const filteredDoctors = doctors.filter(doctor => doctor.id.includes(searchQuery));
+    const filteredDoctors = doctors.filter(doctor => doctor.dname.includes(searchQuery));
     setDoctors(filteredDoctors);
   };
 
@@ -60,49 +63,46 @@ export default function ViewDoctors() {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <input 
             type="text" 
-            placeholder="Search by Doctor ID" 
+            placeholder="Search by Doctor Name" 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
             style={{ height:'40px', width: '300px', marginRight: '10px' }} 
           />
-          <Button variant="contained" onClick={handleSearch} style={{ minWidth: '30px', height: '40px', backgroundColor: '#7FDEFF', color: '#000000' }}>
+          <Button variant="contained" onClick={handleSearch} style={{ minWidth: '30px', height: '40px', backgroundColor: '#1976D2', color: '#FFF' }}>
             <SearchIcon />
           </Button>
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 10px' }}>
         <TableContainer component={Paper} style={{ maxWidth: 'calc(100% - 80px)', width: '1300px' }}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
                 <StyledTableCell>S.No.</StyledTableCell>
-                <StyledTableCell align="right">DOCTOR ID</StyledTableCell>
-                <StyledTableCell align="right">DOCTOR NAME</StyledTableCell>
-                <StyledTableCell align="right">GENDER</StyledTableCell>
-                <StyledTableCell align="right">SPECIALIZATION</StyledTableCell>
-                <StyledTableCell align="right">EMAIL</StyledTableCell>
-                <StyledTableCell align="right">ACTIONS</StyledTableCell>
+                
+                <StyledTableCell align="left">DOCTOR NAME</StyledTableCell>
+                <StyledTableCell align="left">HOSPITAL NAME</StyledTableCell>
+                <StyledTableCell align="left">EMAIL</StyledTableCell>
+                <StyledTableCell align="left">ACTIONS</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {doctors.map((doctor, index) => (
-                <StyledTableRow key={doctor.id}>
-                  <StyledTableCell component="th" scope="row">
+                <TableRow key={doctor.doctorId}>
+                  <TableCell component="th" scope="row">
                     {index + 1}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">{doctor.docotrId}</StyledTableCell>
-                  <StyledTableCell align="right">{doctor.dName}</StyledTableCell>
-                  <StyledTableCell align="right">{doctor.gender}</StyledTableCell>
-                  <StyledTableCell align="right">{doctor.specialization}</StyledTableCell>
-                  <StyledTableCell align="right">{doctor.email}</StyledTableCell>
-                  <StyledTableCell align="right">
-                    <Link to={{ pathname: `/a`, state: { doctor }}} style={{ textDecoration: 'none' }}>
-                      <Button variant="contained" color="primary">
+                  </TableCell>
+                  <TableCell align="left">{doctor.dname}</TableCell>
+                  <TableCell align="left">{doctor.hospitalName}</TableCell>
+                  <TableCell align="left">{doctor.email}</TableCell>
+                  <TableCell align="left">
+                    <Link to={`/doctor-details/${doctor.doctorId}`} style={{ textDecoration: 'none' }}>
+                    <Button variant="contained" style={{ backgroundColor: '#1976d2' }} onClick={() => handleViewDetails(doctor.doctorId)}>
                         View
                       </Button>
                     </Link>
-                  </StyledTableCell>
-                </StyledTableRow>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
