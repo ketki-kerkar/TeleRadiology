@@ -27,7 +27,7 @@ public class FindUser {
     @Autowired
     private PatientRepo patientRepo ;
 
-    public ResponseEntity<UserDTO> findUserEntitiesByEmail(String email) {
+    public ResponseEntity<DoctorRepo.UserDTO> findUserEntitiesByEmail(String email) {
         Optional<User> userOptional = userRepo.findByEmail(email);
         if (userOptional.isPresent()) {
             UUID userId = userOptional.get().getUserId();
@@ -35,7 +35,7 @@ public class FindUser {
             List<LabDTO> labs = findLabsByUserId(userId);
             List<DoctorDTO> doctors = findDoctorsByUserId(userId);
             List<PatientDTO> patients = findPatientsByUserId(userId);
-            UserDTO userDTO = new UserDTO(email, hospitalHandles, labs, doctors, patients);
+            DoctorRepo.UserDTO userDTO = new DoctorRepo.UserDTO(email, hospitalHandles, labs, doctors, patients);
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

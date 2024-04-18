@@ -1,7 +1,9 @@
 package com.example.security.services.doctor;
 
 import com.example.security.Model.Actors.Doctor;
+import com.example.security.Model.Actors.Patient;
 import com.example.security.Repositories.DoctorRepo;
+import com.example.security.Repositories.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +12,13 @@ import java.util.List;
 public class ListUsers {
     @Autowired
     private DoctorRepo doctorRepo;
+    @Autowired
+    private PatientRepo patientRepo;
 
     public List<Doctor> getAllDoctor() {
         return doctorRepo.findAll();
+    }
+    public List<Patient> getAllPatient(){
+        return patientRepo.findAll();
     }
 }

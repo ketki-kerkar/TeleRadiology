@@ -3,9 +3,9 @@ package com.example.security.auth;
 import com.example.security.DTOs.DoctorByHospitalDTO;
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.*;
-import com.example.security.DTOs.UserDTO;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.FindUser;
@@ -134,7 +134,7 @@ public class HospitalHandleController {
     }
 
     @PostMapping("/findUser/ByEmail")
-    public ResponseEntity<UserDTO> getUserEntitiesByEmail(
+    public ResponseEntity<DoctorRepo.UserDTO> getUserEntitiesByEmail(
             @RequestHeader(name = "Authorization") String token,
             @RequestBody EmailRequest emailRequest) {
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
@@ -147,7 +147,7 @@ public class HospitalHandleController {
         }
         try {
             String email = emailRequest.getEmail();
-            ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
+            ResponseEntity<DoctorRepo.UserDTO> response = findUser.findUserEntitiesByEmail(email);
             return response;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

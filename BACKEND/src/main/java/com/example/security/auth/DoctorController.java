@@ -1,10 +1,12 @@
 package com.example.security.auth;
 
 import com.example.security.DTOs.DoctorDTO;
+import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.CaseSummaryRequest;
 import com.example.security.DTOs.Requests.ConsentRequest;
 import com.example.security.DTOs.Requests.PrescriptionRequest;
 import com.example.security.Model.Actors.Doctor;
+import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
 import com.example.security.Repositories.UserRepo;
 import com.example.security.services.doctor.ListUsers;
@@ -109,6 +111,33 @@ public class DoctorController {
         dto.setHospitalName(doctor.getHospital().getHospitalName());
         dto.setEmail(doctor.getUser().getEmail());
         dto.setQualification(doctor.getQualification());
+        return dto;
+    }
+    @GetMapping("/viewList/ofPatients")
+    public ResponseEntity<List<PatientDTO>> getAllPatient(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<PatientDTO> patientDTOs = listUsers.getAllPatient()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(patientDTOs);
+    }
+    private PatientDTO convertToDTO(Patient patient) {
+        PatientDTO dto = new PatientDTO();
+        dto.setName(patient.getName());
+        dto.setEmail(patient.getUser().getEmail());
+        dto.setAge(patient.getAge());
+        dto.setAddress(patient.getAddress());
+        dto.setContact(patient.getContact());
+        dto.setGender(patient.getGender());
+        dto.setDateOfRegistration(patient.getDateOfRegistration());
         return dto;
     }
 
