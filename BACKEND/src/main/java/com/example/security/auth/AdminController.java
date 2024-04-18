@@ -156,6 +156,7 @@ public class AdminController {
         dto.setDName(doctor.getDName());
         dto.setHospitalName(doctor.getHospital().getHospitalName());
         dto.setEmail(doctor.getUser().getEmail());
+        dto.setDType(doctor.getDType());
         return dto;
     }
 
@@ -182,7 +183,17 @@ public class AdminController {
 
 
     @PutMapping("/delete-user")
-    public ResponseEntity<String> disableDoctor(@RequestBody UserRequestEmail request){
+    public ResponseEntity<String> disableDoctor(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody UserRequestEmail request){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         ResponseEntity<String> response=deleteUser.disableUser(request.getEmail());
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok(response.getBody());

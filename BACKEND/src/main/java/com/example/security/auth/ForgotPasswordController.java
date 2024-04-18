@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
-public class PasswordController {
+public class ForgotPasswordController {
     @Autowired
     private ForgotPasswordService forgotPasswordService;
 

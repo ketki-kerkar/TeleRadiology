@@ -48,7 +48,17 @@ public class DoctorController {
 
 
     @PutMapping("/add-case-summary")
-    public ResponseEntity<String> AddCaseSummary(@RequestBody CaseSummaryRequest request) {
+    public ResponseEntity<String> AddCaseSummary(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody CaseSummaryRequest request) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             logger.info("Received request to add caseSummary: {}", request);
             caseSummaryService.addcaseSummary(request);
@@ -62,7 +72,17 @@ public class DoctorController {
     }
 
     @PostMapping("/add-prescription")
-    public ResponseEntity<String> AddPrescription(@RequestBody PrescriptionRequest request) {
+    public ResponseEntity<String> AddPrescription(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody PrescriptionRequest request) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             logger.info("Received request to add Prescription: {}", request);
             prescriptionService.addPrescription(request);
@@ -76,8 +96,18 @@ public class DoctorController {
     }
 
     @PostMapping("/ask-consent")
-    public ResponseEntity<String> askConsent(@RequestBody ConsentRequest request)//ConsentRequest is present in DTO->Request. For data that is passed in consent api body
+    public ResponseEntity<String> askConsent(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody ConsentRequest request)//ConsentRequest is present in DTO->Request. For data that is passed in consent api body
     {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             logger.info("Received request to send consent: {}", request);
             consentservice.askConsent(request);
