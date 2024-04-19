@@ -9,6 +9,10 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import PeopleIcon from '@mui/icons-material/People';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import GradingIcon from '@mui/icons-material/Grading';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import './Navbar.css';
 
 
@@ -132,6 +136,38 @@ export const SidebarData = {
       title: 'New Case',
       path: '/receptionist/newCase',
       icon: <  ContentCopyIcon/>,
+      cName: 'nav-text'
+    },
+  ],
+  patient: [
+    {
+      title: 'Home',
+      path: '/patient',
+      icon: <HomeIcon className="icon-hover"/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Profile',
+      path: '/patient/viewProfile',
+      icon: <AccountCircleIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'View Policy',
+      path: '/patient/viewPolicy',
+      icon: <GradingIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Launch Complaint',
+      path: '/patient/launchComplaint',
+      icon: < FeedbackIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Change Password',
+      path: '/patient/changePassword',
+      icon: < LockResetIcon/>,
       cName: 'nav-text'
     },
   ],

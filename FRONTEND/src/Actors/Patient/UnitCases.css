@@ -1,0 +1,98 @@
+
+.individual-case-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.individual-case-container li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px; /* Add some margin between each item */
+}
+
+.individual-case-container h2 {
+  margin: -10px;
+}
+
+.individual-case-container div {
+  margin-top: 10px; /* Add space between groups of text */
+}
+
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: 'Quicksand', sans-serif; /* Adjust the height of the container */
+}
+
+.white-box {
+  display: flex;
+  flex-direction: row;
+  width: 80%; /* Adjust the width as per your requirement */
+  background-color: white;
+  margin-top: -10%;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.vertical-line {
+  width: 1px;
+  background-color: #ccc; /* Grey color for the vertical line */
+}
+
+.left-half,
+.right-half {
+  flex: 1;
+  padding: 20px; /* Adjust the padding as per your requirement */
+}
+
+.right-half {
+  border-left: 2px solid #ccc; /* Add border to separate the halves */
+}
+
+.left-half {
+  flex: 1;
+  padding: 80px 10px; /* Adjust the padding to include only horizontal padding */
+}
+
+.horizontal-line {
+  border: none;
+  border-bottom: 2px solid #d9d9d9; /* Grey color for the horizontal line */
+  margin: 30px 0;
+}
+
+.button-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  
+}
+
+.button-container button {
+  width: 150px;
+  margin-right: 20px;
+  margin-top: 10px;
+  margin-left: 20px; /* Add space between buttons */
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.zoom-container {
+  overflow: hidden;
+  width: 400px; /* Adjust the width of the zoom container */
+  height: 400px; /* Adjust the height of the zoom container */
+}
+
+.zoom-image {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease;
+}
+
+.zoom-image:hover {
+  transform: scale(1.5); /* Increase the scale for zoom effect */
+}
