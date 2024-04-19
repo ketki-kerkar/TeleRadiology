@@ -6,7 +6,9 @@ import com.example.security.converter.LongListConverter;
 import lombok.*;
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -48,4 +50,7 @@ public class Case {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
+
+    @OneToMany(mappedBy = "cases", cascade = CascadeType.ALL)
+    private Set<AccessTable> accessTables = new HashSet<>();
 }

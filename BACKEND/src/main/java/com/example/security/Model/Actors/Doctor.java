@@ -1,10 +1,14 @@
 package com.example.security.Model.Actors;
 
+import com.example.security.Model.AccessTable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -40,4 +44,7 @@ public class Doctor {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "doctor")
+    private Set<AccessTable> accessTables = new HashSet<>();
 }
