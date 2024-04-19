@@ -27,9 +27,9 @@ public class ViewConsentRequestService {
     @Autowired
     private PatientRepo patientRepo;
 
-   /* public List<CaseDetailsDTO> getCaseDetailsByEmail(String email) {
+    public List<CaseDetailsDTO> getCaseDetailsByEmail(String email) {
         // Find patientId based on the given email
-        Long patientId = patientRepo.findByUser_Email(email)
+        Long patientId = patientRepo.findByUserEmail(email)
                 .map(patient -> patient.getPatientId())
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found for email: " + email));
 
@@ -70,7 +70,7 @@ public class ViewConsentRequestService {
         }
 
         return caseDetails;
-    }*/
+    }
 
 }
 
