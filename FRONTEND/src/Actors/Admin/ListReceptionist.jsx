@@ -47,11 +47,6 @@ export default function ListReceptionist() {
     fetchData();
   }, [authToken]);
 
-  const handleViewDetails = (receptionistId) => {
-    // Handle viewing details of the receptionist here
-    console.log("Viewing details of receptionist with ID:", receptionistId);
-  };
-
   const handleSearch = () => {
     // Filter the receptionists based on the searchQuery
     const filteredReceptionists = receptionists.filter(receptionist => receptionist.id.includes(searchQuery));
@@ -87,23 +82,25 @@ export default function ListReceptionist() {
             <TableHead>
               <TableRow>
                 <StyledTableCell>S.No.</StyledTableCell>
-                <StyledTableCell align="left">RECEPTIONIST NAME</StyledTableCell>
+                <StyledTableCell align="left">HOSPITAL NAME</StyledTableCell>
                 <StyledTableCell align="left">EMAIL</StyledTableCell>
                 <StyledTableCell align="left">ACTIONS</StyledTableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
               {receptionists.map((receptionist, index) => (
-                <StyledTableRow key={receptionist.id}>
+                <StyledTableRow key={receptionist.email}>
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
                   <StyledTableCell align="left">{receptionist.hospitalName}</StyledTableCell>
                   <StyledTableCell align="left">{receptionist.email}</StyledTableCell>
                   <StyledTableCell align="left">
-                    <Button variant="contained" color="primary" onClick={() => handleViewDetails(receptionist.id)}>
-                      View
-                    </Button>
+                  <Link to={{ pathname:'/admin/listReceptionist/viewReceptionist', search: `?email=${receptionist.email}` }} style={{ textDecoration: 'none', color: '#fff' }}>
+                      <Button variant="contained" style={{ backgroundColor: '#1976d2' }}>
+                        View
+                      </Button>
+                  </Link>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
