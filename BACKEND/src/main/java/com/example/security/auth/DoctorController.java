@@ -2,6 +2,7 @@ package com.example.security.auth;
 
 import com.example.security.DTOs.DoctorDTO;
 import com.example.security.DTOs.PatientDTO;
+import com.example.security.DTOs.PatientWithCaseDTO;
 import com.example.security.DTOs.Requests.CaseSummaryRequest;
 import com.example.security.DTOs.Requests.ConsentRequest;
 import com.example.security.DTOs.Requests.EmailRequest;
@@ -157,7 +158,7 @@ public class DoctorController {
     }
 
     @GetMapping("/viewList/ofPatients")
-    public ResponseEntity<List<PatientDTO>> getAllPatients(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<PatientWithCaseDTO>> getAllPatients(@RequestHeader(name = "Authorization") String token) {
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
         if (userEmail == null) {
             return ResponseEntity.badRequest().body(null);
@@ -168,10 +169,11 @@ public class DoctorController {
         }
 
         // Fetch patients under the doctor
-        List<PatientDTO> patientDTOs = listUsers.getPatientsUnderDoctor(userEmail);
+        List<PatientWithCaseDTO> patientDTOs = listUsers.getPatientsUnderDoctor(userEmail);
 
         return ResponseEntity.ok(patientDTOs);
     }
+
 
     @PostMapping("/findUser/ByEmail")
     public ResponseEntity<UserDTO> getUserEntitiesByEmail(
@@ -210,7 +212,7 @@ public class DoctorController {
             }
 
             // Check if the email belongs to a patient under the doctor
-            List<PatientDTO> patientsUnderDoctor = listUsers.getPatientsUnderDoctor(userEmail);
+            List<PatientWithCaseDTO> patientsUnderDoctor = listUsers.getPatientsUnderDoctor(userEmail);
             boolean isPatientUnderDoctor = patientsUnderDoctor.stream()
                     .anyMatch(patient -> patient.getEmail().equals(email));
 

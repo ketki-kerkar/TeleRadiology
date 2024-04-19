@@ -1,6 +1,6 @@
 package com.example.security.services.doctor;
 
-import com.example.security.DTOs.PatientDTO;
+import com.example.security.DTOs.PatientWithCaseDTO;
 import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.Repositories.CaseRepo;
@@ -28,7 +28,7 @@ public class ListUsers {
     }
 
     // Service method to get patients under a specific doctor using doctor's email
-    public List<PatientDTO> getPatientsUnderDoctor(String doctorEmail) {
+    public List<PatientWithCaseDTO> getPatientsUnderDoctor(String doctorEmail) {
         // Fetch doctor by email
         Optional<Doctor> doctor = doctorRepo.findByUserEmail(doctorEmail);
         if (doctor.isEmpty()) {
@@ -37,23 +37,21 @@ public class ListUsers {
         }
 
         // Fetch cases under the doctor
-        List<Long> caseIds = caseRepo.findByDoctorUserEmail(doctorEmail)
-                .stream()
-                .map(Case::getPatient)
-                .map(Patient::getPatientId)
-                .collect(Collectors.toList());
+        List<Case> cases = caseRepo.findByDoctorUserEmail(doctorEmail);
 
-        // Fetch patients using caseIds
-        List<Patient> patients = patientRepo.findByPatientIdIn(caseIds);
+        // Fetch patients associated with the cases
+        List<Patient> patients = cases.stream()
+                .map(Case::getPatient)
+                .collect(Collectors.toList());
 
         // Convert patients to DTOs
         return patients.stream()
-                .map(this::convertToDTO)
+                .map(patient -> convertToDTO(patient, cases))
                 .collect(Collectors.toList());
     }
 
-    private PatientDTO convertToDTO(Patient patient) {
-        PatientDTO dto = new PatientDTO();
+    private PatientWithCaseDTO convertToDTO(Patient patient, List<Case> cases) {
+        PatientWithCaseDTO dto = new PatientWithCaseDTO();
         dto.setName(patient.getName());
         dto.setEmail(patient.getUser().getEmail());
         dto.setAge(patient.getAge());
@@ -61,6 +59,18 @@ public class ListUsers {
         dto.setContact(patient.getContact());
         dto.setGender(patient.getGender());
         dto.setDateOfRegistration(patient.getDateOfRegistration());
+
+        // Find the case associated with the patient
+        Optional<Case> patientCase = cases.stream()
+                .filter(c -> c.getPatient().equals(patient))
+                .findFirst();
+
+        // Populate case ID and case status if a case is found
+        if (patientCase.isPresent()) {
+            dto.setCaseId(patientCase.get().getCaseId());
+            dto.setCaseStatus(patientCase.get().getCaseStatus());
+        }
+
         return dto;
     }
 }
