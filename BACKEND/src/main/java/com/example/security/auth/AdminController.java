@@ -7,7 +7,6 @@ import com.example.security.Model.Actors.HospitalHandle;
 import com.example.security.Model.Actors.Lab;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.Model.Actors.User;
-import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.DeleteUser;
@@ -156,12 +155,11 @@ public class AdminController {
         dto.setDName(doctor.getDName());
         dto.setHospitalName(doctor.getHospital().getHospitalName());
         dto.setEmail(doctor.getUser().getEmail());
-        dto.setDType(doctor.getDType());
         return dto;
     }
 
     @PostMapping("/findUser/ByEmail")
-    public ResponseEntity<DoctorRepo.UserDTO> getUserEntitiesByEmail(
+    public ResponseEntity<UserDTO> getUserEntitiesByEmail(
             @RequestHeader(name = "Authorization") String token,
             @RequestBody EmailRequest emailRequest) {
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
@@ -174,7 +172,7 @@ public class AdminController {
         }
         try {
             String email = emailRequest.getEmail();
-            ResponseEntity<DoctorRepo.UserDTO> response = findUser.findUserEntitiesByEmail(email);
+            ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
             return response;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

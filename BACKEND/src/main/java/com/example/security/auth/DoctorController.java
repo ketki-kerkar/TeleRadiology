@@ -144,7 +144,7 @@ public class DoctorController {
         return dto;
     }
     @GetMapping("/viewList/ofPatients")
-    public ResponseEntity<List<PatientDTO>> getAllPatient(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<PatientDTO>> getAllPatients(@RequestHeader(name = "Authorization") String token) {
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
         if (userEmail == null) {
             return ResponseEntity.badRequest().body(null);
@@ -153,23 +153,10 @@ public class DoctorController {
         if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
             return ResponseEntity.badRequest().body(null);
         }
-        List<PatientDTO> patientDTOs = listUsers.getAllPatient()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+
+        // Fetch patients under the doctor
+        List<PatientDTO> patientDTOs = listUsers.getPatientsUnderDoctor(userEmail);
+
         return ResponseEntity.ok(patientDTOs);
     }
-    private PatientDTO convertToDTO(Patient patient) {
-        PatientDTO dto = new PatientDTO();
-        dto.setName(patient.getName());
-        dto.setEmail(patient.getUser().getEmail());
-        dto.setAge(patient.getAge());
-        dto.setAddress(patient.getAddress());
-        dto.setContact(patient.getContact());
-        dto.setGender(patient.getGender());
-        dto.setDateOfRegistration(patient.getDateOfRegistration());
-        return dto;
-    }
-
-
 }
