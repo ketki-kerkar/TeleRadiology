@@ -2,17 +2,17 @@ package com.example.security.services.patient;
 
 import com.example.security.DTOs.CaseDetailsDTO;
 import com.example.security.Model.Actors.Doctor;
+import com.example.security.Model.Actors.Patient;
+import com.example.security.Model.Actors.User;
 import com.example.security.Model.Consent;
 import com.example.security.Repositories.ConsentRepo;
 import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.PatientRepo;
+import com.example.security.Repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,52 +25,59 @@ public class ViewConsentRequestService {
     private DoctorRepo doctorRepo;
 
     @Autowired
+    private UserRepo userRepo ;
+
+    @Autowired
     private PatientRepo patientRepo;
 
     public List<CaseDetailsDTO> getCaseDetailsByEmail(String email) {
-        // Find patientId based on the given email
-        Long patientId = patientRepo.findByUserEmail(email)
-                .map(patient -> patient.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found for email: " + email));
+        // Find user based on the given email
+        Optional<User> userOptional = userRepo.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found for email: " + email);
+        }
 
-        // Call the existing getCaseDetails method with the found patientId
-        return getCaseDetails(patientId);
-    }
+        // Get the user ID
+        UUID userId = userOptional.get().getUserId();
 
-    // Existing method to fetch case details by patientId
-    public List<CaseDetailsDTO> getCaseDetails(Long patientId) {
-        //function to view the list of radiologist at patient side by passing caseId and email of 3 radio. as request body
+        // Find patient based on the user ID
+        Optional<Patient> patientOptional = patientRepo.findByUserUserId(userId);
+        if (patientOptional.isEmpty()) {
+            throw new IllegalArgumentException("Patient not found for email: " + email);
+        }
+        Long patientId = patientOptional.get().getPatientId();
+
         // Fetch consent with pending status for the given patientId
         Consent consent = consentRepo.findByPatient_PatientIdAndConsentStatus(patientId, "pending");
-
         if (consent == null) {
             return new ArrayList<>(); // or handle the consent not found scenario
         }
 
-        // Get the caseId associated with the pending consent
-        Long caseId = consent.getCases().getCaseId();
+        // Update the consent status to "completed" so that while listing it can be removed
+        consent.setConsentStatus("completed");
+        consentRepo.save(consent); // Save the updated consent
 
-        // Split the listOfRadiologistId string by comma and convert to Long
-        List<Long> listOfRadiologistId = Arrays.stream(consent.getListOfRadiologistId().split(","))
+        // Get the list of radiologist IDs from the consent
+        String listOfRadiologistIdString = consent.getListOfRadiologistId();
+        List<Long> listOfRadiologistId = Arrays.stream(listOfRadiologistIdString.split(","))
                 .map(Long::valueOf)
                 .collect(Collectors.toList());
 
-        List<CaseDetailsDTO> caseDetails = new ArrayList<>();
-
         // Fetch doctor details based on listOfRadiologistId
+        List<CaseDetailsDTO> caseDetails = new ArrayList<>();
         for (Long doctorId : listOfRadiologistId) {
             Optional<Doctor> doctorOptional = doctorRepo.findById(doctorId);
             doctorOptional.ifPresent(doctor -> {
                 CaseDetailsDTO caseDetail = new CaseDetailsDTO();
-                caseDetail.setCaseId(caseId); // Set the caseId for each doctor
+                caseDetail.setCaseId(consent.getCases().getCaseId()); // Set the caseId for each doctor
                 caseDetail.setDName(doctor.getDName());
                 caseDetail.setHospitalName(doctor.getHospital().getHospitalName());
                 caseDetails.add(caseDetail);
             });
         }
-
         return caseDetails;
     }
+
 
 }
 

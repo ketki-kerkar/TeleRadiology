@@ -79,7 +79,7 @@ public class FindUser {
     }
 
     private List<PatientDTO> findPatientsByUserId(UUID userId) {
-        List<Patient> patients = patientRepo.findByUserUserId(userId);
+        Optional<Patient> patients = patientRepo.findByUserUserId(userId);
         if (patients != null) {
             return patients.stream()
                     .map(p -> new PatientDTO(

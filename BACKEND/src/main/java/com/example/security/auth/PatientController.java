@@ -22,6 +22,7 @@ public class PatientController {
 
     @Autowired
     private SelectingRadiologist selectingRadiologist;
+
     @PostMapping("/case-details")
     public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(@RequestBody EmailRequest emailRequest) {
         try {
@@ -40,8 +41,6 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Return 500 for internal server error
         }
     }
-
-
 
     @PostMapping("/sendNotifications")
     public ResponseEntity<String> sendInvitation(@RequestBody SelectingInvitationRequest selectingInvitationRequest) {

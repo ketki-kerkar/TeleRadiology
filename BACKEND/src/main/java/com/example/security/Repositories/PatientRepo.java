@@ -8,9 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface PatientRepo extends JpaRepository<Patient, Long>{
+public interface PatientRepo extends JpaRepository<Patient, Long> {
     List<Patient> findAll();
-    Optional<Patient> findByUserEmail(String email);
-    List<Patient> findByUserUserId(UUID userId);
-    List<Patient> findByPatientIdIn(List<Long> patientIds);
+
+    Optional<Patient> findByUserEmail(String emailId);
+
+    Optional<Patient> findByUser_Email(String email);
+
+    Optional<Patient> findByUserUserId(UUID userId);
 }
