@@ -4,11 +4,12 @@ import com.example.security.DTOs.DoctorDTO;
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.CaseSummaryRequest;
 import com.example.security.DTOs.Requests.ConsentRequest;
+import com.example.security.DTOs.Requests.EmailRequest;
 import com.example.security.DTOs.Requests.PrescriptionRequest;
-import com.example.security.Model.Actors.Doctor;
-import com.example.security.Model.Actors.Patient;
-import com.example.security.Model.Actors.User;
-import com.example.security.Repositories.UserRepo;
+import com.example.security.DTOs.UserDTO;
+import com.example.security.Model.Actors.*;
+import com.example.security.Repositories.*;
+import com.example.security.services.admin.FindUser;
 import com.example.security.services.doctor.ListUsers;
 import com.example.security.services.doctor.CaseSummaryService;
 import com.example.security.services.doctor.ConsentService;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,8 +46,18 @@ public class DoctorController {
 
     private final JwtService jwtService;
     private final UserRepo userRepo;
-
-
+    @Autowired
+    private CaseRepo caseRepo;
+    @Autowired
+    private DoctorRepo doctorRepo;
+    @Autowired
+    private PatientRepo patientRepo;
+    @Autowired
+    private LabRepo labRepo;
+    @Autowired
+    private HospitalHandleRepo hospitalHandleRepo;
+    @Autowired
+    private FindUser findUser;
 
     @PutMapping("/add-case-summary")
     public ResponseEntity<String> AddCaseSummary(
@@ -143,6 +155,7 @@ public class DoctorController {
         dto.setQualification(doctor.getQualification());
         return dto;
     }
+
     @GetMapping("/viewList/ofPatients")
     public ResponseEntity<List<PatientDTO>> getAllPatients(@RequestHeader(name = "Authorization") String token) {
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
@@ -158,5 +171,59 @@ public class DoctorController {
         List<PatientDTO> patientDTOs = listUsers.getPatientsUnderDoctor(userEmail);
 
         return ResponseEntity.ok(patientDTOs);
+    }
+
+    @PostMapping("/findUser/ByEmail")
+    public ResponseEntity<UserDTO> getUserEntitiesByEmail(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody EmailRequest emailRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            String email = emailRequest.getEmail();
+
+            // Check if the user is a lab
+            Optional<Lab> labOptional = labRepo.findByUserEmail(email);
+            if (labOptional.isPresent()) {
+                // If the user is a lab, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            // Check if the user is a hospital handle
+            Optional<HospitalHandle> hospitalHandleOptional = hospitalHandleRepo.findByUserEmail(email);
+            if (hospitalHandleOptional.isPresent()) {
+                // If the user is a hospital handle, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            // Check if the user is a doctor
+            Optional<Doctor> doctorOptional = doctorRepo.findByUserEmail(email);
+            if (doctorOptional.isPresent()) {
+                ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
+                return response;
+            }
+
+            // Check if the email belongs to a patient under the doctor
+            List<PatientDTO> patientsUnderDoctor = listUsers.getPatientsUnderDoctor(userEmail);
+            boolean isPatientUnderDoctor = patientsUnderDoctor.stream()
+                    .anyMatch(patient -> patient.getEmail().equals(email));
+
+            if (!isPatientUnderDoctor) {
+                // If the email doesn't belong to a patient under the doctor, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            // If none of the above conditions are met, proceed to fetch user details
+            ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
+            return response;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

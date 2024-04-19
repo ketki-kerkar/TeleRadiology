@@ -4,8 +4,12 @@ import com.example.security.DTOs.DoctorByHospitalDTO;
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.Requests.*;
 import com.example.security.DTOs.UserDTO;
+import com.example.security.Model.Actors.HospitalHandle;
+import com.example.security.Model.Actors.Lab;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.HospitalHandleRepo;
+import com.example.security.Repositories.LabRepo;
 import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.FindUser;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.security.services.hospitalHandle.CaseService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,6 +59,12 @@ public class HospitalHandleController {
 
     @Autowired
     private ListUser listUser;
+
+    @Autowired
+    private LabRepo labRepo;
+
+    @Autowired
+    private HospitalHandleRepo hospitalHandleRepo;
 
     @PostMapping("/add-patient")
     public ResponseEntity<AuthenticationResponse> registerPatient(
@@ -147,6 +158,16 @@ public class HospitalHandleController {
         }
         try {
             String email = emailRequest.getEmail();
+            Optional<Lab> labOptional = labRepo.findByUserEmail(email);
+            if (labOptional.isPresent()) {
+                // If the user is a lab, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
+            Optional<HospitalHandle> hospitalHandleOptional = hospitalHandleRepo.findByUserEmail(email);
+            if (hospitalHandleOptional.isPresent()) {
+                // If the user is a hospital handle, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
             ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
             return response;
         } catch (Exception e) {

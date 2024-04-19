@@ -2,11 +2,9 @@ package com.example.security.auth;
 
 import com.example.security.DTOs.*;
 import com.example.security.DTOs.Requests.*;
-import com.example.security.Model.Actors.Doctor;
-import com.example.security.Model.Actors.HospitalHandle;
-import com.example.security.Model.Actors.Lab;
+import com.example.security.Model.Actors.*;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
-import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.PatientRepo;
 import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.DeleteUser;
@@ -20,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,6 +36,8 @@ public class AdminController {
 
     private final JwtService jwtService;
     private final UserRepo userRepo;
+    @Autowired
+    private PatientRepo patientRepo;
 
     @PostMapping("/add-doctor")
     public ResponseEntity<AuthenticationResponse> registerDoctor(
@@ -172,6 +173,11 @@ public class AdminController {
         }
         try {
             String email = emailRequest.getEmail();
+            Optional<Patient> patientOptional = patientRepo.findByUserEmail(email);
+            if (patientOptional.isPresent()) {
+                // If the user is a patient, return bad request
+                return ResponseEntity.badRequest().body(null);
+            }
             ResponseEntity<UserDTO> response = findUser.findUserEntitiesByEmail(email);
             return response;
         } catch (Exception e) {
