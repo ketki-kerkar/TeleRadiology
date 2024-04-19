@@ -1,14 +1,10 @@
 package com.example.security.services.admin;
 
+import com.example.security.DTOs.Requests.*;
 import com.example.security.Model.Actors.*;
-import com.example.security.Repositories.DoctorRepo;
-import com.example.security.Repositories.HospitalHandleRepo;
-import com.example.security.Repositories.LabRepo;
-import com.example.security.Repositories.UserRepo;
-import com.example.security.auth.loginController.AuthenticationResponse;
-import com.example.security.auth.loginController.Requests.DoctorRegisterRequest;
-import com.example.security.auth.loginController.Requests.HospitalRegisterRequest;
-import com.example.security.auth.loginController.Requests.LabRegisterRequest;
+import com.example.security.Model.Actors.Patient;
+import com.example.security.Repositories.*;
+import com.example.security.services.hospitalHandle.PatientRegistrationService;
 import com.example.security.services.login.JwtService;
 import com.example.security.services.login.MailService;
 import com.example.security.services.login.RoleService;
@@ -17,10 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 @Service
 @RequiredArgsConstructor
 public class AddUser {
     private final UserRepo userRepo;
+    private final PatientRepo patientRepo;
     private final HospitalHandleRepo hospitalHandleRepo;
     private final DoctorRepo doctorRepo;
     private final LabRepo labRepo;
@@ -28,7 +27,43 @@ public class AddUser {
     private final JwtService jwtService;
     private final RoleService roleService;
     private final MailService mailService;
+    private final PatientRegistrationService patientregisterservice;
 
+    @Transactional
+    public AuthenticationResponse registerPatient(PatientRegistrationRequest request){
+        Role userRole = roleService.findRoleByName("patient");
+        String generatedPassword = generateRandomPassword();
+        String encryptedPassword = passwordEncoder.encode(generatedPassword);
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(encryptedPassword)
+                .role(userRole)
+                .build();
+
+        userRepo.save(user);
+
+        Patient patient=Patient.builder().
+                name(request.getName()).
+                contact(request.getContact()).
+                bloodGroup(request.getBloodGroup()).
+                gender(request.getGender()).
+                dateOfBirth(request.getDateOfBirth()).
+                address(request.getAddress()).
+                dateOfRegistration(new Timestamp(System.currentTimeMillis())).
+                age(patientregisterservice.calculateAge(request.getDateOfBirth())).
+                user(user).
+                build();
+        patientRepo.save(patient);
+        mailService.sendMail(request.getEmail(), "Registration Successful", "Your account has been successfully registered. Your password is: " + generatedPassword);
+
+        var jwtToken = jwtService.generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .role(userRole.getRoleName())
+                .build();
+
+    }
     @Transactional
     public AuthenticationResponse registerHospital(HospitalRegisterRequest request) {
         Role userRole = roleService.findRoleByName("receptionist");

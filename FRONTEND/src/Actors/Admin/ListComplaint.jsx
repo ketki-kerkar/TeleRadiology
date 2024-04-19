@@ -26,6 +26,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListComplaint() {
+  const authToken = localStorage.getItem('authToken');
   const [complaints, setComplaints] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredComplaints, setFilteredComplaints] = useState([]);
@@ -33,7 +34,10 @@ export default function ListComplaint() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/admin/listComplaints');
+        const response = await axios.get('http://localhost:3000/admin/listComplaints',{
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }});
         setComplaints(response.data); // Assuming the response data is an array of complaints
       } catch (error) {
         console.error('Error fetching complaints:', error);
@@ -41,7 +45,7 @@ export default function ListComplaint() {
     };
 
     fetchData();
-  }, []);
+  }, [authToken]);
   
   useEffect(() => {
     setFilteredComplaints(complaints.filter(complaint => complaint.id.includes(searchQuery)));

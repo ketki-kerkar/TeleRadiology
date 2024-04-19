@@ -31,4 +31,9 @@ public class DashboardController {
     public String receptionistDashboard() {
         return "receptionist-dashboard"; // Return the view for receptionist dashboard
     }
+
+    @GetMapping("/patient-dashboard")
+    public String patientDashboard() {
+        return "patient-dashboard"; // Return the view for patient dashboard
+    }
 }

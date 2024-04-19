@@ -9,6 +9,8 @@ import LabImage from '../../Images/labs.svg';
 import caseImage from '../../Images/cases.svg';
 import patient from '../../Images/patient-robe-clothes-svgrepo-com.svg';
 import Navbar from '../../Components/Navbar';
+import { CssBaseline } from '@mui/material';
+
 
 const CustomPaper = styled(Paper)(({ theme }) => ({
   margin: '40px',
@@ -43,6 +45,7 @@ export default function Home() {
   return (
     <body className='this-div'>
       <Navbar userRole ="admin"/>
+      <CssBaseline/>
       <h1> WELCOME ADMIN!</h1>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>

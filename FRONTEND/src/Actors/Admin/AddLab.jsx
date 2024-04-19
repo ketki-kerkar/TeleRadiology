@@ -27,6 +27,7 @@ const StyledForm = styled('form')(({ theme }) => ({
 }));
 
 export default function AddLab() {
+  const authToken = localStorage.getItem('authToken');
 
   const [labName, setlabName] = useState("");
   const [nameError, setNameError] = useState(false);
@@ -65,7 +66,10 @@ export default function AddLab() {
       email: email,
     };
 
-    axios.post('http://localhost:9191/api/v1/admin/add-lab', formData)
+    axios.post('http://localhost:9191/api/v1/admin/add-lab', formData,  {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }})
       .then(response => {
         setSubmitting(false);
         setOpenDialog(true);
@@ -177,4 +181,3 @@ export default function AddLab() {
     </ThemeProvider>
   );
 }
-
