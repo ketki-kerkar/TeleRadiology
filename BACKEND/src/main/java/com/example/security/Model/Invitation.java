@@ -1,5 +1,6 @@
 package com.example.security.Model;
 
+import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Actors.Patient;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,11 +26,15 @@ public class Invitation {
     private Date TimestampReceived;
 
     @Column(name="invitationStatus")
-    private String InvitationStatus = "pending";
+    private String InvitationStatus = "Pending";
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "Time_of_sent", nullable = false)
+    @Column(name = "Time_of_accepted", nullable = false)
     private Date TimestampAccepted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id")
+    private Doctor doctor ;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "case_id")

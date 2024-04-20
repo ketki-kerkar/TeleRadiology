@@ -63,7 +63,7 @@ public class FindUser {
     }
 
     private List<DoctorDTO> findDoctorsByUserId(UUID userId) {
-        List<Doctor> doctors = doctorRepo.findByUserUserId(userId);
+        Optional<Doctor> doctors = doctorRepo.findByUserUserId(userId);
         if (doctors != null) {
             return doctors.stream()
                     .map(d -> new DoctorDTO(

@@ -31,7 +31,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/forgot-password").permitAll()
                 .requestMatchers("/api/v1/verify-otp").permitAll()
                 .requestMatchers("/api/v1/reset-password").permitAll()
-                .requestMatchers("/api/v1/consent/**").permitAll()
+                .requestMatchers("/api/v1/patient/**").permitAll()
                 //.requestMatchers("/api/v1/receptionist/**").permitAll()
                 //.requestMatchers("/api/v1/lab/**").permitAll()
                 //.requestMatchers("/api/v1/doctor/**").permitAll()

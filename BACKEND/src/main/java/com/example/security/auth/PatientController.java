@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/consent")
+@RequestMapping("/api/v1/patient")
 public class PatientController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class PatientController {
     private DiagnosisPdfService diagnosisPdfService;
 
 
-    @PostMapping("/case-details")
+    @PostMapping("/consent-details")
     public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(@RequestBody EmailRequest emailRequest) {
         try {
             String email = emailRequest.getEmail();
@@ -62,7 +62,6 @@ public class PatientController {
 
 
     }
-
 
     @PostMapping("/sendNotifications")
     public ResponseEntity<String> sendInvitation(@RequestBody SelectingInvitationRequest selectingInvitationRequest) {
