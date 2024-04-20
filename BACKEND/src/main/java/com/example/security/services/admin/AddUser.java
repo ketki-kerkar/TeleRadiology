@@ -8,7 +8,10 @@ import com.example.security.services.hospitalHandle.PatientRegistrationService;
 import com.example.security.services.login.JwtService;
 import com.example.security.services.login.MailService;
 import com.example.security.services.login.RoleService;
+import com.example.security.Model.Token;
+import com.example.security.Model.TokenType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import java.sql.Timestamp;
 @RequiredArgsConstructor
 public class AddUser {
     private final UserRepo userRepo;
+    private final TokenRepo tokenRepo;
     private final PatientRepo patientRepo;
     private final HospitalHandleRepo hospitalHandleRepo;
     private final DoctorRepo doctorRepo;
@@ -40,7 +44,7 @@ public class AddUser {
                 .role(userRole)
                 .build();
 
-        userRepo.save(user);
+        var savedUser = userRepo.save(user);
 
         Patient patient=Patient.builder().
                 name(request.getName()).
@@ -57,6 +61,14 @@ public class AddUser {
         mailService.sendMail(request.getEmail(), "Registration Successful", "Your account has been successfully registered. Your password is: " + generatedPassword);
 
         var jwtToken = jwtService.generateToken(user);
+        var token = Token.builder()
+                .user(savedUser)
+                .token(new BCryptPasswordEncoder().encode(jwtToken))
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepo.save(token);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -75,7 +87,7 @@ public class AddUser {
                 .role(userRole)
                 .build();
 
-        userRepo.save(user);
+        var savedUser = userRepo.save(user);
 
         HospitalHandle hospitalHandle = HospitalHandle.builder()
                 .hospitalName(request.getHospitalName())
@@ -86,6 +98,14 @@ public class AddUser {
         mailService.sendMail(request.getEmail(), "Registration Successful", "Your account has been successfully registered. Your password is: " + generatedPassword);
 
         var jwtToken = jwtService.generateToken(user);
+        var token = Token.builder()
+                .user(savedUser)
+                .token(new BCryptPasswordEncoder().encode(jwtToken))
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepo.save(token);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -104,7 +124,7 @@ public class AddUser {
                 .role(userRole)
                 .build();
 
-        userRepo.save(user);
+        var savedUser = userRepo.save(user);
 
         Lab lab = Lab.builder()
                 .labName(request.getLabName())
@@ -115,6 +135,14 @@ public class AddUser {
         mailService.sendMail(request.getEmail(), "Registration Successful", "Your account has been successfully registered. Your password is: " + generatedPassword);
 
         var jwtToken = jwtService.generateToken(user);
+        var token = Token.builder()
+                .user(savedUser)
+                .token(new BCryptPasswordEncoder().encode(jwtToken))
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepo.save(token);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -133,7 +161,7 @@ public class AddUser {
                 .role(role)
                 .build();
 
-        userRepo.save(user);
+        var savedUser = userRepo.save(user);
 
         HospitalHandle hospitalHandle = hospitalHandleRepo.findByHospitalName(request.getHospitalName())
                 .orElseThrow(() -> new RuntimeException("Hospital not found"));
@@ -153,6 +181,14 @@ public class AddUser {
         mailService.sendMail(request.getEmail(), "Registration Successful", "Your account has been successfully registered. Your password is: " + generatedPassword);
 
         var jwtToken = jwtService.generateToken(user);
+        var token = Token.builder()
+                .user(savedUser)
+                .token(new BCryptPasswordEncoder().encode(jwtToken))
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepo.save(token);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)

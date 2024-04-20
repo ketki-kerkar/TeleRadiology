@@ -1,5 +1,6 @@
 package com.example.security.Config;
 
+import com.example.security.Repositories.TokenRepo;
 import com.example.security.services.login.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepo tokenRepo;
 
     @Override
     protected void doFilterInternal(
@@ -51,7 +53,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(jwt); // to extract the userEmail from jwt token ;
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            var isTokenValid = tokenRepo.findByToken(jwt)
+                    .map(t -> !t.isExpired() && !t.isRevoked())
+                    .orElse(false);
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

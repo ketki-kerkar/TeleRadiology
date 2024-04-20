@@ -6,6 +6,8 @@ import com.example.security.DTOs.Requests.RegisterRequest;
 import com.example.security.Model.Actors.Role;
 import com.example.security.Model.Actors.User;
 import com.example.security.Repositories.*;
+import com.example.security.Model.Token;
+import com.example.security.Model.TokenType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,7 @@ public class AuthenticationService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final UserRepo userRepo;
+    private final TokenRepo tokenRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -37,14 +40,37 @@ public class AuthenticationService {
                 .build();
 
         logger.info("Received role: {}", role);
-        userRepo.save(user);
+        var savedUser = userRepo.save(user);
 
         var jwtToken = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwtToken);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .role(role.getRoleName())
                 .build();
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepo.findAllValidTokensByUser(user.getUserId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(t -> {
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepo.saveAll(validUserTokens);
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepo.save(token);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -59,6 +85,8 @@ public class AuthenticationService {
 
         var jwtToken = jwtService.generateToken(user);
         var role = user.getRole().getRoleName();
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
