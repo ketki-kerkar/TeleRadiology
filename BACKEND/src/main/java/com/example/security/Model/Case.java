@@ -33,8 +33,9 @@ public class Case {
     @Column(name = "case_registration_date", nullable = false, updatable = false)
     private Date caseRegistrationDate;
 
-    @Column(name = "final_report_url")
-    private String finalReportUrl;
+    @Column(name = "diagnosis_report", columnDefinition = "TEXT")
+    private String diagnosisReportBase64;
+
 
     @Column(name = "consented_user_ids")
     @Convert(converter = LongListConverter.class)

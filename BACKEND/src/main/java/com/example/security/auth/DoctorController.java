@@ -3,27 +3,25 @@ package com.example.security.auth;
 import com.example.security.DTOs.DoctorDTO;
 import com.example.security.DTOs.PatientDTO;
 import com.example.security.DTOs.PatientWithCaseDTO;
-import com.example.security.DTOs.Requests.CaseSummaryRequest;
-import com.example.security.DTOs.Requests.ConsentRequest;
-import com.example.security.DTOs.Requests.EmailRequest;
-import com.example.security.DTOs.Requests.PrescriptionRequest;
+import com.example.security.DTOs.Requests.*;
 import com.example.security.DTOs.UserDTO;
 import com.example.security.Model.Actors.*;
 import com.example.security.Repositories.*;
 import com.example.security.services.admin.FindUser;
-import com.example.security.services.doctor.ListUsers;
-import com.example.security.services.doctor.CaseSummaryService;
-import com.example.security.services.doctor.ConsentService;
-import com.example.security.services.doctor.PrescriptionService;
+import com.example.security.services.doctor.*;
 import com.example.security.services.login.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,6 +42,8 @@ public class DoctorController {
     private PrescriptionService prescriptionService;
     @Autowired
     private CaseSummaryService caseSummaryService;
+    @Autowired
+    private DiagnosisPdfService diagnosisPdfService;
 
     private final JwtService jwtService;
     private final UserRepo userRepo;
@@ -148,6 +148,30 @@ public class DoctorController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(doctorDTOs);
     }
+    @PostMapping("/diagnosis")
+    public ResponseEntity<InputStreamResource> getDiagnosis(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody DiagnosisRequest request) throws java.io.IOException {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+
+            return ResponseEntity.badRequest().body(null);
+        }
+        System.out.println(request);
+        ByteArrayInputStream pdf=diagnosisPdfService.createDiagnosisPdf(request);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Disposition", "inline;file=diagnosis.pdf");
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(pdf));
+
+    }
+
     private DoctorDTO convertToDTO(Doctor doctor) {
         DoctorDTO dto = new DoctorDTO();
         dto.setDName(doctor.getDName());
