@@ -25,7 +25,7 @@ public class Notification {
     private Date Timestamp;
 
     @Column(name="Notification_Status")
-    private String Notification_Status = "pending";
+    private String Notification_Status = "Pending";
 
     @Column(name="messageText")
     private String MessageText;
@@ -38,7 +38,7 @@ public class Notification {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @Transient
+    @Column(name = "receiver_type")
     private char receiverType;
 
     public void setReceiverType(char receiverType) {
@@ -51,5 +51,6 @@ public class Notification {
             throw new IllegalArgumentException("Invalid receiver type: " + receiverType);
         }
     }
+
 
 }

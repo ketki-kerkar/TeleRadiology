@@ -2,8 +2,10 @@ package com.example.security.services.patient;
 
 import com.example.security.Model.Case;
 import com.example.security.Model.Invitation;
+import com.example.security.Model.Notification;
 import com.example.security.Repositories.CaseRepo;
 import com.example.security.Repositories.InvitationRepo;
+import com.example.security.Repositories.NotificationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,9 @@ public class SelectingRadiologist {
 
     @Autowired
     private CaseRepo caseRepo;
+
+    @Autowired
+    private NotificationRepo notificationRepo;
 
     public void sendInvitation(Long caseId, String receiverEmail) {
         //function when patient selects a radiologists and click accept button
@@ -38,5 +43,15 @@ public class SelectingRadiologist {
         invitation.setTimestampAccepted(new Date()); // <-- Set TimestampAccepted to current system time
         // Save the invitation
         invitationRepo.save(invitation);
+
+        // After saving the invitation, update the Notification table
+        Notification notification = new Notification();
+        notification.setTimestamp(new Date());
+        notification.setMessageText("The patient selected a radiologist");
+        notification.setReceiverType('d'); // Receiver is a doctor
+        // Set the associated doctorId from the Case entity
+        notification.setDoctor(foundCase.getDoctor());
+        // Save the notification
+        notificationRepo.save(notification);
     }
 }

@@ -7,6 +7,7 @@ import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
 import com.example.security.Model.Case;
 import com.example.security.Model.Invitation;
+import com.example.security.Model.Notification;
 import com.example.security.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class AcceptingInvitationService {
     private AccessTableRepo accessTableRepo;
     @Autowired
     private UserRepo userRepo ;
+    @Autowired
+    private NotificationRepo notificationRepo;
 
     public void acceptInvitation(AcceptInvRequest acceptInvRequest) {
         // Find the Doctor from the database using the provided email
@@ -74,6 +77,7 @@ public class AcceptingInvitationService {
 
         // If AccessTable entry is successfully saved, update the Invitation status to "Accepted"
         if (accessTableEntry != null) {
+            // AccessTable entry saved successfully, proceed with updating the invitation status
             // Find the Invitation by caseId
             Optional<Invitation> invitationOptional = invitationRepo.findById(acceptInvRequest.getCaseId());
             if (invitationOptional.isEmpty()) {
@@ -88,6 +92,16 @@ public class AcceptingInvitationService {
 
             // Save the updated Invitation
             invitationRepo.save(invitation);
+
+            // Check if the invitation status was successfully updated
+            if (invitation != null) {
+                // Invitation status updated successfully, proceed with updating the notification table
+                updateNotificationTable(caseEntity, doctor);
+            } else {
+                // Handle the case where the invitation status could not be updated
+                throw new RuntimeException("Failed to update invitation status.");
+            }
+
         } else {
             // If AccessTable entry is not saved, update the Invitation status to "Rejected"
             // Find the Invitation by caseId
@@ -108,4 +122,33 @@ public class AcceptingInvitationService {
             throw new RuntimeException("Failed to save AccessTable entry.");
         }
     }
+    private void updateNotificationTable(Case caseEntity, Doctor doctor) {
+        // Retrieve patient from the caseEntity
+        Patient patient = caseEntity.getPatient();
+
+        // Create two notification entries: one for the patient and one for the doctor
+        createNotificationEntry(patient, "The patient selected a radiologist", "p");
+        createNotificationEntry(doctor, "The patient selected a radiologist", "d");
+    }
+
+    private void createNotificationEntry(Object receiver, String messageText, String receiverType) {
+        if (!(receiver instanceof User)) {
+            throw new IllegalArgumentException("Receiver must be an instance of User (Doctor or Patient).");
+        }
+
+        Notification notification = new Notification();
+        notification.setMessageText(messageText);
+        notification.setNotification_Status("Pending"); // Corrected method name
+        notification.setTimestamp(new Date()); // Corrected method name
+        notification.setReceiverType(receiverType.charAt(0)); // Assuming 'p' or 'd' for patient or doctor
+
+        if ("d".equals(receiverType) && receiver instanceof Doctor) {
+            notification.setDoctor((Doctor) receiver);
+        } else if ("p".equals(receiverType) && receiver instanceof Patient) {
+            notification.setPatient((Patient) receiver);
+        }
+
+        notificationRepo.save(notification);
+    }
 }
+

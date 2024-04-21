@@ -34,7 +34,7 @@ public class RadiologistController {
         }
     }
 
-    @PostMapping("/list-invitations")
+    @PostMapping("/list")
     public ResponseEntity<List<InvitationDTO>> listInvitations(@RequestBody EmailRequest emailRequest) {
         String receiverEmail = emailRequest.getEmail();
         List<InvitationDTO> invitations = listingInvitations.getInvitationsByReceiverEmail(receiverEmail);
