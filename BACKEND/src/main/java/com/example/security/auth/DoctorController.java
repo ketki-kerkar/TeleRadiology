@@ -178,6 +178,7 @@ public class DoctorController {
         dto.setHospitalName(doctor.getHospital().getHospitalName());
         dto.setEmail(doctor.getUser().getEmail());
         dto.setQualification(doctor.getQualification());
+        dto.setDType(doctor.getDType());
         return dto;
     }
 
