@@ -1,8 +1,10 @@
 package com.example.security.services.hospitalHandle;
 
+import com.example.security.Model.AccessTable;
 import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Case;
 import com.example.security.Model.Actors.Patient;
+import com.example.security.Repositories.AccessTableRepo;
 import com.example.security.Repositories.CaseRepo;
 import com.example.security.Repositories.DoctorRepo;
 import com.example.security.Repositories.PatientRepo;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -21,11 +22,14 @@ public class CaseService {
     private final PatientRepo patientRepo;
     private final DoctorRepo doctorRepo;
 
+    private final AccessTableRepo accessTableRepo;
+
     @Autowired
-    public CaseService(CaseRepo caseRepo, PatientRepo patientRepo, DoctorRepo doctorRepo) {
+    public CaseService(CaseRepo caseRepo, PatientRepo patientRepo, DoctorRepo doctorRepo, AccessTableRepo accessTableRepo) {
         this.caseRepo = caseRepo;
         this.patientRepo = patientRepo;
         this.doctorRepo = doctorRepo;
+        this.accessTableRepo = accessTableRepo;
     }
 
     public void createCase(String patientEmail, String doctorEmail) {
@@ -46,6 +50,14 @@ public class CaseService {
         newCase.setCaseRegistrationDate(new Date());
         // Set other default values as necessary
 
-        caseRepo.save(newCase);
+        Case savedCase = caseRepo.save(newCase);
+
+        // Create AccessTable entry
+        AccessTable accessTable = new AccessTable();
+        accessTable.setDoctor(doctor);
+        accessTable.setCases(savedCase);
+        accessTable.setTimestampAccepted(new Date()); // Current date and time
+
+        accessTableRepo.save(accessTable);
     }
 }
