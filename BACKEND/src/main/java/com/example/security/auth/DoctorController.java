@@ -44,6 +44,8 @@ public class DoctorController {
     private CaseSummaryService caseSummaryService;
     @Autowired
     private DiagnosisPdfService diagnosisPdfService;
+    @Autowired
+    private SeverityService addSeverityService;
 
     private final JwtService jwtService;
     private final UserRepo userRepo;
@@ -106,6 +108,22 @@ public class DoctorController {
             return new ResponseEntity<>("Failed to add prescription", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @PostMapping("/add-severity")
+    public ResponseEntity<String> addSeverity(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody SeverityRequest request){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        addSeverityService.addSeverity(request);
+        return new ResponseEntity<>("Severity added successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/ask-consent")
