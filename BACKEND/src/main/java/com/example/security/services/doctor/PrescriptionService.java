@@ -34,4 +34,19 @@ public class PrescriptionService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not added");
     }
 
+    public String getPrescription(Long caseId){
+
+        Optional<Case> caseOptional = caseRepo.findById(caseId);
+        if(caseOptional.isPresent()){
+            Case caseObj = caseOptional.get();
+
+            // Retrieve prescription associated with the case
+            Prescription prescription = prescriptionRepo.findByCaseId(caseObj.getCaseId());
+            String prescribedTest=prescription.getPrescriptionTests();
+            return prescribedTest; // Assuming this is how you get prescription tests
+
+        }
+        return "Case not found";
+    }
+
 }

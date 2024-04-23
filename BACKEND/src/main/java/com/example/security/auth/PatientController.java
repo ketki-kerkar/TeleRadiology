@@ -5,6 +5,7 @@ import com.example.security.DTOs.PatientIdRequestDTO;
 import com.example.security.DTOs.Requests.EmailRequest;
 import com.example.security.DTOs.Requests.SelectingInvitationRequest;
 import com.example.security.services.doctor.DiagnosisPdfService;
+import com.example.security.services.doctor.PrescriptionService;
 import com.example.security.services.patient.SelectingRadiologist;
 import com.example.security.services.patient.ViewConsentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class PatientController {
     private SelectingRadiologist selectingRadiologist;
     @Autowired
     private DiagnosisPdfService diagnosisPdfService;
-
+    @Autowired
+    private PrescriptionService prescriptionService;
 
     @PostMapping("/consent-details")
     public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(@RequestBody EmailRequest emailRequest) {
@@ -61,6 +63,11 @@ public class PatientController {
                 body(new InputStreamResource(pdf));
 
 
+    }
+    @GetMapping("/get-prescription")
+    public String getPrescription(@RequestParam Long caseId){
+        String prescription=prescriptionService.getPrescription(caseId);
+        return  prescription;
     }
 
     @PostMapping("/sendNotifications")
