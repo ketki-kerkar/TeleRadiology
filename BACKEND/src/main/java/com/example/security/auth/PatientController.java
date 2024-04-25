@@ -4,10 +4,18 @@ import com.example.security.DTOs.CaseDetailsDTO;
 import com.example.security.DTOs.PatientIdRequestDTO;
 import com.example.security.DTOs.Requests.EmailRequest;
 import com.example.security.DTOs.Requests.SelectingInvitationRequest;
+import com.example.security.DTOs.Requests.UserIssueRequest;
+import com.example.security.Model.Actors.User;
+import com.example.security.Repositories.UserRepo;
 import com.example.security.services.doctor.DiagnosisPdfService;
 import com.example.security.services.doctor.PrescriptionService;
+import com.example.security.services.login.JwtService;
 import com.example.security.services.patient.SelectingRadiologist;
+import com.example.security.services.patient.UserRequestService;
 import com.example.security.services.patient.ViewConsentRequestService;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +30,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/patient")
+@RequiredArgsConstructor
 public class PatientController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
 
     @Autowired
     private ViewConsentRequestService viewConsentRequestService;
@@ -33,6 +44,11 @@ public class PatientController {
     private DiagnosisPdfService diagnosisPdfService;
     @Autowired
     private PrescriptionService prescriptionService;
+    @Autowired
+    private UserRequestService userRequestService;
+
+    private final JwtService jwtService;
+    private final UserRepo userRepo;
 
     @PostMapping("/consent-details")
     public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(@RequestBody EmailRequest emailRequest) {
@@ -77,6 +93,47 @@ public class PatientController {
             return new ResponseEntity<>("Invitation sent successfully", HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/add-technical-issues")
+    public ResponseEntity<String> reportTechnicalIssue(@RequestHeader(name = "Authorization") String token,
+                                                       @RequestBody UserIssueRequest request) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            logger.info("Received request to send Technical Issue: {}", request);
+            userRequestService.addTechnicalIssue(request);
+            logger.info("Technical Issue sent successfully");
+            return new ResponseEntity<>("Technical issue reported successfully: " ,HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to report technical issue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/request-delete-account")
+    public ResponseEntity<String> requestDeleteAccount(@RequestHeader(name = "Authorization") String token,
+                                                       @RequestBody UserIssueRequest request) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            logger.info("Received request to delete your account: {}", request);
+            userRequestService.addDeleteAccountRequest(request);
+            logger.info("Delete Account Request sent successfully");
+            return new ResponseEntity<>("Delete account request sent successfully: " ,HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to send request", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
