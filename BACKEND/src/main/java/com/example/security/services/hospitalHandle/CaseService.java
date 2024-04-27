@@ -1,5 +1,6 @@
 package com.example.security.services.hospitalHandle;
 
+import com.example.security.DTOs.CaseDetailsDTO;
 import com.example.security.Model.AccessTable;
 import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Case;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -59,5 +61,9 @@ public class CaseService {
         accessTable.setTimestampAccepted(new Date()); // Current date and time
 
         accessTableRepo.save(accessTable);
+    }
+    public List<Case> getCaseDetailsByEmail(String userEmail) {
+        List<Case> caseList = caseRepo.findByPatientUserEmail(userEmail);
+        return caseList;
     }
 }

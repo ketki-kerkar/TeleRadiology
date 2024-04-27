@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
     @Autowired
     private ListUser listUser ;
     @Autowired

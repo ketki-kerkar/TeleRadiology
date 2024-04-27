@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CaseRepo extends JpaRepository<Case, Long> {
     List<Case> findByDoctorUserEmail(String doctorEmail);
+    List<Case> findByPatientUserEmail(String patientEmail);
 }

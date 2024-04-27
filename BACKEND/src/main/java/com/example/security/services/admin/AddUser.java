@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 @Service
 @RequiredArgsConstructor
 public class AddUser {
+
     private final UserRepo userRepo;
     private final TokenRepo tokenRepo;
     private final PatientRepo patientRepo;
