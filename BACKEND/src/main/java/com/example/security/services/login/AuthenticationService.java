@@ -3,8 +3,7 @@ package com.example.security.services.login;
 import com.example.security.DTOs.Requests.AuthenticationRequest;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
 import com.example.security.DTOs.Requests.RegisterRequest;
-import com.example.security.Model.Actors.Role;
-import com.example.security.Model.Actors.User;
+import com.example.security.Model.Actors.*;
 import com.example.security.Repositories.*;
 import com.example.security.Model.Token;
 import com.example.security.Model.TokenType;
@@ -29,6 +28,10 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RoleService roleService;
+    private final DoctorRepo doctorRepo;
+    private final LabRepo labRepo;
+    private final HospitalHandleRepo hospitalHandleRepo;
+    private final PatientRepo patientRepo;
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
@@ -85,12 +88,41 @@ public class AuthenticationService {
 
         var jwtToken = jwtService.generateToken(user);
         var role = user.getRole().getRoleName();
+        String name = switch (role) {
+            case "doctor" -> {
+                Doctor doctor = doctorRepo.findByUserUserId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                yield doctor.getDName();
+            }
+            case "receptionist" -> {
+                HospitalHandle receptionist = hospitalHandleRepo.findByUUId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Receptionist not found"));
+                yield receptionist.getHospitalName();
+            }
+            case "radiologist" -> {
+                Doctor radiologist = doctorRepo.findByUserUserId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Radiologist not found"));
+                yield radiologist.getDName();
+            }
+            case "lab" -> {
+                Lab lab = labRepo.findByUUId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Lab not found"));
+                yield lab.getLabName();
+            }
+            case "patient" -> {
+                Patient patient = patientRepo.findByUUId(user.getUserId())
+                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+                yield patient.getName();
+            }
+            default -> throw new IllegalArgumentException("Invalid role: " + role);
+        };
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .role(role)
+                .name(name)
                 .build();
     }
 
