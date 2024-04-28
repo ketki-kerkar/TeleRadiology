@@ -83,25 +83,19 @@ export default function ViewDoctors() {
                 <StyledTableCell align="left">DOCTOR NAME</StyledTableCell>
                 <StyledTableCell align="left">HOSPITAL NAME</StyledTableCell>
                 <StyledTableCell align="left">EMAIL</StyledTableCell>
-                <StyledTableCell align="left">ACTIONS</StyledTableCell>
+                <StyledTableCell align="left">DOCTOR TYPE</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {doctors.map((doctor, index) => (
-                <TableRow key={doctor.doctorId}>
+                <TableRow key={doctor.email}>
                   <TableCell component="th" scope="row">
                     {index + 1}
                   </TableCell>
                   <TableCell align="left">{doctor.dname}</TableCell>
                   <TableCell align="left">{doctor.hospitalName}</TableCell>
                   <TableCell align="left">{doctor.email}</TableCell>
-                  <TableCell align="left">
-                    <Link to={`/doctor-details/${doctor.doctorId}`} style={{ textDecoration: 'none' }}>
-                    <Button variant="contained" style={{ backgroundColor: '#1976d2' }} onClick={() => handleViewDetails(doctor.doctorId)}>
-                        View
-                      </Button>
-                    </Link>
-                  </TableCell>
+                  <TableCell align="left">{doctor.dtype}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
