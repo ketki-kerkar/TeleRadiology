@@ -19,7 +19,7 @@ public class ForgotPasswordController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> requestBody) {
-        String email = requestBody.get("emailId");
+        String email = requestBody.get("email");
         forgotPasswordService.forgotPassword(email);
         return ResponseEntity.ok("An email with instructions to reset your password has been sent to your email address.");
     }
