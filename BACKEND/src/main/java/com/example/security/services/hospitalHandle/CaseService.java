@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -65,5 +66,9 @@ public class CaseService {
     public List<Case> getCaseDetailsByEmail(String userEmail) {
         List<Case> caseList = caseRepo.findByPatientUserEmail(userEmail);
         return caseList;
+    }
+    public Case getCaseById(Long caseId) {
+        Optional<Case> optionalCase = caseRepo.findById(caseId);
+        return optionalCase.orElse(null); // Return null if case not found
     }
 }

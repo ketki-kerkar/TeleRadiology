@@ -2,9 +2,11 @@ package com.example.security.auth;
 
 import com.example.security.DTOs.CaseDetailsDTO;
 import com.example.security.DTOs.PatientDTO;
+import com.example.security.DTOs.Requests.CaseIdRequest;
 import com.example.security.DTOs.Requests.EmailRequest;
 import com.example.security.DTOs.Requests.SelectingInvitationRequest;
 import com.example.security.DTOs.Requests.UserIssueRequest;
+import com.example.security.Model.Actors.Doctor;
 import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
 import com.example.security.Model.Case;
@@ -32,6 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/patient")
@@ -114,22 +117,70 @@ public class PatientController {
         return  prescription;
     }
     @GetMapping("/viewList/ofCases")
-    public ResponseEntity<List<Case>> viewListOfCases(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<List<CaseDetailsDTO>> viewListOfCases(@RequestHeader(name = "Authorization") String token) {
         try {
             String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
             if (userEmail == null) {
                 return ResponseEntity.badRequest().build(); // Return 400 if no user email found
             }
-            List<Case> caseDetails = caseService.getCaseDetailsByEmail(userEmail);
+            List <CaseDetailsDTO> caseDetails = caseService.getCaseDetailsByEmail(userEmail)
+                    .stream()
+                    .map(this::convertToDTO) // Convert Case to CaseDTO
+                    .collect(Collectors.toList());
+
 
             if (caseDetails.isEmpty()) {
-                return ResponseEntity.notFound().build(); // Return 404 if no case details found
+                return ResponseEntity.notFound().build();
             } else {
-                return ResponseEntity.ok(caseDetails); // Return case details if found
+                return ResponseEntity.ok(caseDetails);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Return 500 for internal server error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    @PostMapping("/viewCase")
+    public ResponseEntity<CaseDetailsDTO> getCaseDetailsById(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody CaseIdRequest caseIdRequest) {
+
+        try {
+            String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+            if (userEmail == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Long caseId = caseIdRequest.getCaseId();
+            if (caseId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Case caseEntity = caseService.getCaseById(caseId);
+            if (caseEntity == null) {
+                return ResponseEntity.notFound().build(); // Return 404 if case not found
+            }
+
+            CaseDetailsDTO caseDTO = convertToDTO(caseEntity); // Convert Case to CaseDTO
+            return ResponseEntity.ok(caseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    private CaseDetailsDTO convertToDTO(Case caseEntity) {
+        CaseDetailsDTO caseDTO = new CaseDetailsDTO();
+        caseDTO.setCaseId(caseEntity.getCaseId());
+        caseDTO.setCaseStatus(caseEntity.getCaseStatus());
+        caseDTO.setCaseRegistrationDate(caseEntity.getCaseRegistrationDate());
+        if (caseEntity.getDoctor() != null) {
+            Doctor doctor = caseEntity.getDoctor();
+            caseDTO.setDName(doctor.getDName());
+            if (doctor.getHospital() != null) {
+                caseDTO.setHospitalName(doctor.getHospital().getHospitalName());
+            }
+        }
+        return caseDTO;
     }
     @PostMapping("/sendNotifications")
     public ResponseEntity<String> sendInvitation(@RequestBody SelectingInvitationRequest selectingInvitationRequest) {
