@@ -4,8 +4,10 @@ import com.example.security.DTOs.*;
 import com.example.security.DTOs.Requests.*;
 import com.example.security.Model.Actors.*;
 import com.example.security.DTOs.Requests.AuthenticationResponse;
+import com.example.security.Model.UserRequest;
 import com.example.security.Repositories.PatientRepo;
 import com.example.security.Repositories.UserRepo;
+import com.example.security.Repositories.UserRequestRepo;
 import com.example.security.services.admin.AddUser;
 import com.example.security.services.admin.DeleteUser;
 import com.example.security.services.admin.FindUser;
@@ -34,7 +36,7 @@ public class AdminController {
     private final FindUser findUser;
     @Autowired
     private final DeleteUser deleteUser;
-
+    private final UserRequestRepo userRequestRepo;
     private final JwtService jwtService;
     private final UserRepo userRepo;
     @Autowired
@@ -206,5 +208,31 @@ public class AdminController {
             System.out.println("hello");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response.getBody());
         }
+    }
+
+    @GetMapping("/view-complaints")
+    public ResponseEntity<List<UserRequestDTO>> getAllComplaints(@RequestHeader(name = "Authorization") String token) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"admin".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<UserRequest> complaints = userRequestRepo.findAll(); // Assuming complaintRepo is the repository for UserRequest
+
+        List<UserRequestDTO> complaintDTOs = complaints.stream()
+                .map(complaint -> {
+                    UserRequestDTO dto = new UserRequestDTO();
+                    dto.setPatientEmail(complaint.getPatientEmail());
+                    dto.setRequestType(complaint.getRequestType());
+                    dto.setRequestDate(complaint.getRequestDate());
+                    dto.setRequestStatus(complaint.isRequestStatus());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(complaintDTOs);
     }
 }

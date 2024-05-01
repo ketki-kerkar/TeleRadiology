@@ -24,6 +24,9 @@ public class UserRequest {
     @Column(name = "request_content")
     private String requestContent;
 
+    @Column(name = "request_status")
+    private boolean requestStatus;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "request_date", nullable = false)
     private Date requestDate;
@@ -31,6 +34,11 @@ public class UserRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
+
+    @Transient
+    private String patientEmail;
+
+    public String getPatientEmail() {
+        return this.patient.getUser().getEmail();
+    }
 }
-
-
