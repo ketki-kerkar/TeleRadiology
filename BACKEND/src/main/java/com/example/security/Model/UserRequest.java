@@ -24,6 +24,9 @@ public class UserRequest {
     @Column(name = "request_content")
     private String requestContent;
 
+    @Column(name = "request_status")
+    private boolean requestStatus;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "request_date", nullable = false)
     private Date requestDate;
