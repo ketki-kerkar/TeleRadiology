@@ -81,7 +81,7 @@ export default function CreateCase() {
           Authorization: `Bearer ${authToken}`
         }
       });
-      const patient = response.data.patients[0]; // Assuming there's only one patient
+      const patient = response.data.patients[0]; 
       setPatientData(patient);
       console.log(patientData);
     } catch (error) {
@@ -139,7 +139,7 @@ export default function CreateCase() {
       <CssBaseline />
       <StyledContainer>
         <Grid item xs={12}>
-          <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', margin: '10px 0px' }}>Select the patient Id for new case:</Typography>
+          <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', margin: '10px 0px' }}>Select the patient Email for new case:</Typography>
           <Autocomplete
             id="patient-email-autocomplete"
             options={suggestedPatientEmails}
@@ -232,4 +232,3 @@ export default function CreateCase() {
     </ThemeProvider>
   );
 }
-
