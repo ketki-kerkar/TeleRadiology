@@ -52,9 +52,15 @@ public class LabController {
         return "UP";
     }
 
-    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        s3Service.uploadFile(file.getOriginalFilename(), file);
+   
+    @PostMapping(path = "/uploadFile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String uploadFile(@RequestPart("jsonFile") MultipartFile jsonFile,
+                             @RequestPart("dicomFile") MultipartFile dicomFile,
+                             @RequestPart("prescriptionId") String prescriptionId) throws IOException {
+        s3Service.uploadFile(jsonFile.getOriginalFilename(), jsonFile);
+        s3Service.uploadDicomFile("Cases" , dicomFile.getOriginalFilename(), dicomFile);
+        Long presId=Long.parseLong(prescriptionId);
+        s3Service.StoreAwsUrlInCaesTable(presId,"anujag78@gmail.com",jsonFile.getOriginalFilename());
         return "File uploaded";
     }
 

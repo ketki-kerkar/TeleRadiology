@@ -52,6 +52,9 @@ public class Case {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    @Column(name="aws_url")
+    private String awsUrl;
+
     @OneToMany(mappedBy = "cases", cascade = CascadeType.ALL)
     private Set<AccessTable> accessTables = new HashSet<>();
 }
