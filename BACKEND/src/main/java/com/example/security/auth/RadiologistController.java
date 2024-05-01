@@ -5,6 +5,10 @@ import com.example.security.DTOs.InvitationDTO;
 import com.example.security.DTOs.Requests.AcceptInvRequest;
 import com.example.security.DTOs.Requests.AnnotatedImageRequest;
 import com.example.security.DTOs.Requests.EmailRequest;
+import com.example.security.Model.Actors.User;
+import com.example.security.Model.AnnotatedImages;
+import com.example.security.Repositories.UserRepo;
+import com.example.security.services.login.JwtService;
 import com.example.security.services.radiologist.AcceptingInvitationService;
 import com.example.security.services.radiologist.AnnotatedImageService;
 import com.example.security.services.radiologist.ListingInvitations;
@@ -26,9 +30,23 @@ public class RadiologistController {
 
     @Autowired
     private ListingInvitations listingInvitations;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private UserRepo userRepo;
 
     @PostMapping("/accept-invitation")
-    public ResponseEntity<String> acceptInvitation(@RequestBody AcceptInvRequest acceptInvRequest) {
+    public ResponseEntity<String> acceptInvitation(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody AcceptInvRequest acceptInvRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             acceptingInvitationService.acceptInvitation(acceptInvRequest);
             return ResponseEntity.ok("Invitation accepted successfully");
@@ -40,7 +58,17 @@ public class RadiologistController {
     }
 
     @PostMapping("/list")
-    public ResponseEntity<List<InvitationDTO>> listInvitations(@RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<List<InvitationDTO>> listInvitations(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody EmailRequest emailRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         String receiverEmail = emailRequest.getEmail();
         List<InvitationDTO> invitations = listingInvitations.getInvitationsByReceiverEmail(receiverEmail);
         return ResponseEntity.ok(invitations);
@@ -50,9 +78,17 @@ public class RadiologistController {
     private AnnotatedImageService annotatedImageService;
     private static final Logger logger = LoggerFactory.getLogger(RadiologistController.class);
     @PostMapping("/upload-image-annotated")
-    public ResponseEntity<String> uploadAnnotatedImage(@RequestBody AnnotatedImageRequest request){
-        //logger.info("Received request to upload Annotated Image: {}", request.getAnnotatedImageBase64());
-        //System.out.println(request.getAnnotatedImageBase64());
+    public ResponseEntity<String> uploadAnnotatedImage(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody AnnotatedImageRequest request){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         annotatedImageService.uploadAnnotations(request);
         //logger.info("Uploaded annotated Images  successfully");
         return new ResponseEntity<>("Uploaded annotated Images successfully", HttpStatus.OK);
@@ -60,9 +96,20 @@ public class RadiologistController {
 
 
     @GetMapping("/get-list-of-annotatedimages")
-    public List<AnnotatedImagesDTO> getListOfAnnotatedImages(@RequestParam Long caseId){
+    public ResponseEntity<List<AnnotatedImagesDTO>> getListOfAnnotatedImages(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam Long caseId){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         //  List<AnnotatedImagesDTO> listOfannotatedImages=annotatedImageService.getListofAnnotatedImages(caseId);
         // return listOfannotatedImages;
-        return annotatedImageService.getListOfAnnotatedImagesDTOByCaseId(caseId);
+        List<AnnotatedImagesDTO> listOfAnnotatedImages=annotatedImageService.getListOfAnnotatedImagesDTOByCaseId(caseId);
+        return  ResponseEntity.ok(listOfAnnotatedImages);
     }
 }
