@@ -16,6 +16,6 @@ public class ConsentRequest {
     private Long caseId;
     private Long doctorId;
     private Long patientId;
-    private List<Long> listOfRadiologistId;
+    private List<String> listOfRadiologistId;
 
 }

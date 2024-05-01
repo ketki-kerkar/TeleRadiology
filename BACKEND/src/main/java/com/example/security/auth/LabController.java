@@ -52,7 +52,7 @@ public class LabController {
         return "UP";
     }
 
-   
+
     @PostMapping(path = "/uploadFile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String uploadFile(@RequestPart("jsonFile") MultipartFile jsonFile,
                              @RequestPart("dicomFile") MultipartFile dicomFile,
