@@ -165,8 +165,12 @@ function PatientCard() {
   
   const handleSeveritySubmit = () => {
     setSubmittingSeverity(true);
+    const formData = {
+      caseId: caseId,
+      isSevere: severity
+    };
    
-    axios.post('http://localhost:9191/api/v1/doctor/add-severity', {caseId : severity} , {
+    axios.post('http://localhost:9191/api/v1/doctor/add-severity' , formData, {
       headers: {
         Authorization: `Bearer ${authToken}`
       }
@@ -374,7 +378,6 @@ function PatientCard() {
                   <FormControl fullWidth variant="outlined" sx={{
                         textAlign:'left',
                         backgroundColor: '#fff',
-                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                         '& .MuiInputLabel-root': { color: '#000' },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: '#000', borderRadius: '4px' },
@@ -417,6 +420,21 @@ function PatientCard() {
                   </Snackbar>
                 </Box>
                   </FormControl>
+                <Typography variant='h6' sx={{textAlign: 'left'}}>Navigate To View Reports and Chats</Typography>
+                <Link to={{ 
+                          pathname: '/doctor/listPatients/patientdetails/chat', 
+                          search: `?caseId=${caseId}&doctorEmail=${doctorEmail}&patientEmail=${patientEmail}`
+                        }} 
+                        style={{textDecoration:'none'}}
+                        
+                      >
+                        <Button 
+                          variant="contained" 
+                          style={{ display: 'flex', justifyContent:'flex-start', marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' ,}}
+                        >
+                          VIEW REPORT AND CHAT
+                        </Button>
+                        </Link>
                   
               </Grid>
                 
