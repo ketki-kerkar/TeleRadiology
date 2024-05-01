@@ -12,6 +12,7 @@ import AddPatient from "./Actors/Receptionist/AddPatient";
 import ViewDoctor from "./Actors/Admin/ViewDoctor";
 import ViewHospital from "./Actors/Admin/ViewReceptionist";
 import ViewLab from "./Actors/Admin/ViewLab";
+import ViewRequestDel from "./Actors/Admin/ViewRequestDel";
 import LabHome from "./Actors/Lab/LabHome";
 import ListLab from "./Actors/Admin/ListLab";
 import ListReceptionist from "./Actors/Admin/ListReceptionist";
@@ -93,6 +94,7 @@ function App() {
                 <Route path="/admin/listLab/viewLab" element={ <ProtectedRoute pathRole="admin"> <ViewLab /> </ProtectedRoute> } />
                 <Route path="/admin/changePassword" element={ <ProtectedRoute pathRole="admin"> <ChangePassword /> </ProtectedRoute> } />
                 <Route path="/admin/userRequests" element={ <ProtectedRoute pathRole="admin"> <UserRequests /> </ProtectedRoute> } />
+                <Route path="/admin/userRequests/viewrequestDel" element={<ProtectedRoute pathRole="admin"> <ViewRequestDel/> </ProtectedRoute>} />
               </>
 
             {/* Doctor Routes */}
