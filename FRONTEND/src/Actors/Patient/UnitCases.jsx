@@ -3,6 +3,7 @@ import { Box, Button, styled } from '@mui/material'; // Import styled from @mui/
 import './UnitCases.css'; // Import your CSS file for styling
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 // Style the Button component using the styled function
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -17,12 +18,10 @@ function UnitCases() {
   const [userData, setUserData] = useState(null); // Initialize userData state with null
   const [error, setError] = useState(null); // Initialize error state with null
   const [isLoading, setIsLoading] = useState(true);
-
-  const staticUnitCases = [
-    { caseId: '123', date: '2024-04-12', doctorName: 'Dr. John Doe', hospitalName: 'City Hospital' },
-    // Add more static unit cases as needed
-  ];
-
+  const location = useLocation(); // Get location object from useLocation
+  
+  // Extract caseId from location state
+  const { state: { caseId } } = location;
   useEffect(() => {
     // Simulate loading delay
     const delay = setTimeout(() => {
@@ -36,7 +35,7 @@ function UnitCases() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/unitCases'); // Provide the API endpoint to fetch unit cases
+        const response = await axios.get('http://localhost:9191/api/v1/patient/viewCase', {caseId}); // Provide the API endpoint to fetch unit cases
         // Check if response data is not null or undefined before setting state
         if (response.data) {
           setUserData(response.data);
@@ -55,7 +54,7 @@ function UnitCases() {
     };
 
     fetchData();
-  }, []);
+  }, [caseId]);
 
   return (
     <div>
@@ -78,14 +77,16 @@ function UnitCases() {
             ) : (
               <>
                 <ul className="individual-case-container">
-                  {staticUnitCases.map((unitCase, index) => (
-                    <li key={index}>
-                      <h2> Case ID: {unitCase.caseId}</h2>
-                      <p>Date: {unitCase.date}</p>
-                      <p>Doctor Name: {unitCase.doctorName}</p>
-                      <p>Hospital Name: {unitCase.hospitalName}</p>
+                  {/* Display userData if available */}
+                  {userData && (
+                    <li>
+                      <h2> Case ID: {userData.caseId}</h2>
+                      <p>Date: {userData.caseRegistrationDate}</p>
+                      <p>Doctor Name: {userData.dName}</p>
+                      <p>Hospital Name: {userData.hospitalName}</p>
+                      <p>Case Status : {userData.caseStatus}</p>
                     </li>
-                  ))}
+                  )}
                 </ul>
               </>
             )}
@@ -127,4 +128,5 @@ function UnitCases() {
 }
 
 export default UnitCases;
+
 

@@ -29,6 +29,17 @@ import ViewReceptionist from "./Actors/Admin/ViewReceptionist";
 import { useState, useEffect } from "react";
 import { LoggedInUserContext } from "./Context/LoggedInUserContext";
 
+import PatientHome from "./Actors/Patient/PatientHome";
+import ViewCase from "./Actors/Patient/ViewCase" ;
+import ViewPolicy from "./Actors/Patient/ViewPolicy" ;
+import ViewProfile from "./Actors/Patient/ViewProfile" ;
+import UnitCases from "./Actors/Patient/UnitCases" ;
+import OTPgen from "./Components/OTPgen";
+import NewPassAfterOtp from "./Components/NewPassAfterOtp";
+import LaunchComplaint from "./Actors/Patient/LaunchComplaint";
+import Invitations from "./Actors/Radiologist/Invitations";
+import Notifications from "./Actors/Radiologist/Invitations";
+
 function App() {
   const data = JSON.parse(window.sessionStorage.getItem("loggedInUser"));
   const [loggedinUser, setLoggedinUser] = useState({
@@ -63,7 +74,10 @@ function App() {
           <Routes>
             <Route exact path="/" element={<LoginComponent />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
-
+            <Route path="/login" element={<LoginComponent/>}/>
+            <Route path="/invitations" element={<Invitations/>}/>
+            <Route path="/notifications" element={<Notifications/>}/>
+            
             {/* Admin Routes */}
               <>
                 <Route exact path="/admin" element={ <ProtectedRoute pathRole="admin"> <AdminHome /> </ProtectedRoute> }/>
@@ -111,6 +125,20 @@ function App() {
                 <Route exact path="/radiologist" element={<ProtectedRoute pathRole="radiologist"><RadiologistHome /></ProtectedRoute>} />
                 <Route path="/radiologist/changePassword" element={<ProtectedRoute pathRole="radiologist"><ChangePassword userRole="radiologist" /></ProtectedRoute>} />
               </>
+
+            {/* Patient Routes */}
+            <>
+                <Route exact path="/patient" element={<ProtectedRoute pathRole="patient"><PatientHome /></ProtectedRoute>} />
+                <Route path="/patient/viewCase" element={<ProtectedRoute pathRole="patient"><ViewCase userRole="patient" /></ProtectedRoute>} />
+                <Route path="/patient/viewCase/unitCases" element={<ProtectedRoute pathRole="patient"><UnitCases userRole="patient" /></ProtectedRoute>} />
+                <Route path="/patient/viewProfile" element={<ProtectedRoute pathRole="patient"><ViewProfile/></ProtectedRoute>} />
+                <Route path="/patient/viewPolicy" element={<ProtectedRoute pathRole="patient"><ViewPolicy/></ProtectedRoute>} />
+                <Route path="/patient/launchComplaint" element={<ProtectedRoute pathRole="patient"><LaunchComplaint/></ProtectedRoute>} />
+                <Route path="/otpGen" element={<OTPgen/>}/>
+                <Route path="/newPass" element={<NewPassAfterOtp/>}/>
+                <Route path="/patient/changePassword" element={ <ProtectedRoute pathRole="patient"> <ChangePassword /> </ProtectedRoute> } />
+              </>
+              
           </Routes>
         </BrowserRouter>
       </LoggedInUserContext.Provider>

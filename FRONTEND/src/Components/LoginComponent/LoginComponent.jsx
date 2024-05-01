@@ -36,7 +36,7 @@ export default function SignInSide() {
       });
 
       const userData = response.data;
-      window.sessionStorage.setItem('loggedInUser', JSON.stringify(userData));
+      localStorage.setItem('authToken', userData.token);
 
       const role = userData.role;
 
