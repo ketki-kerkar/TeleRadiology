@@ -34,6 +34,11 @@ public class UserRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
+
+    @Transient
+    private String patientEmail;
+
+    public String getPatientEmail() {
+        return this.patient.getUser().getEmail();
+    }
 }
-
-
