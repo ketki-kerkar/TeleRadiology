@@ -56,6 +56,9 @@ export default function SignInSide() {
         case 'receptionist':
           navigate('/receptionist');
           break;
+        case 'patient':
+          navigate('/patient');
+          break;
         default:
           navigate('/');
       }
