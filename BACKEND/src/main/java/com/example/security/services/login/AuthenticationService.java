@@ -114,6 +114,7 @@ public class AuthenticationService {
                         .orElseThrow(() -> new RuntimeException("Patient not found"));
                 yield patient.getName();
             }
+            case "admin" -> "ADMIN";
             default -> throw new IllegalArgumentException("Invalid role: " + role);
         };
         revokeAllUserTokens(user);
