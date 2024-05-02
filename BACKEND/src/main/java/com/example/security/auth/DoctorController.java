@@ -85,6 +85,14 @@ public class DoctorController {
         }
 
     }
+    @GetMapping("/get-prescription")
+    public String getPrescription(@RequestHeader(name = "Authorization") String token, @RequestParam Long caseId){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return null;
+        }
+        return prescriptionService.getPrescription(caseId);
+    }
 
     @PostMapping("/add-prescription")
     public ResponseEntity<String> AddPrescription(
