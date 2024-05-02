@@ -76,8 +76,6 @@ function App() {
             <Route exact path="/" element={<LoginComponent />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
             <Route path="/login" element={<LoginComponent/>}/>
-            <Route path="/invitations" element={<Invitations/>}/>
-            <Route path="/notifications" element={<Notifications/>}/>
             
             {/* Admin Routes */}
               <>
@@ -105,6 +103,7 @@ function App() {
                 <Route path="/doctor/listPatients" element={ <ProtectedRoute pathRole="doctor"> <ListPatients /> </ProtectedRoute> } />
                 <Route path="/doctor/listPatients/patientdetails" element={ <ProtectedRoute pathRole="doctor"> <PatientDetails /> </ProtectedRoute> } />
                 <Route path="/doctor/listDoctors" element={ <ProtectedRoute pathRole="doctor"> <ListDoctors /> </ProtectedRoute> } />
+                <Route path="/doctor/notifications" element={<ProtectedRoute pathRole="doctor"> <Notification/></ProtectedRoute>}/>
               </>
 
             {/* Lab Routes */}
@@ -126,6 +125,7 @@ function App() {
               <>
                 <Route exact path="/radiologist" element={<ProtectedRoute pathRole="radiologist"><RadiologistHome /></ProtectedRoute>} />
                 <Route path="/radiologist/changePassword" element={<ProtectedRoute pathRole="radiologist"><ChangePassword userRole="radiologist" /></ProtectedRoute>} />
+                <Route path="/radiologist/invitations" element={<ProtectedRoute pathRole="radiologist"><Invitations userRole="radiologist" /></ProtectedRoute>} />
               </>
 
             {/* Patient Routes */}
@@ -139,6 +139,7 @@ function App() {
                 <Route path="/otpGen" element={<OTPgen/>}/>
                 <Route path="/newPass" element={<NewPassAfterOtp/>}/>
                 <Route path="/patient/changePassword" element={ <ProtectedRoute pathRole="patient"> <ChangePassword /> </ProtectedRoute> } />
+                <Route path="/patient/consents" element={ <ProtectedRoute pathRole="patient"> <Consent /> </ProtectedRoute> } />
               </>
               
           </Routes>
