@@ -113,7 +113,7 @@ export default function ListPatients() {
                       }}
                       style={{ textDecoration: 'none', color: '#fff' }}
                     >
-                      <Button variant="contained" color="primary" onClick={() => handleViewDetails(patient.id)}>
+                      <Button variant="contained" color="primary">
                         View
                       </Button>
                     </Link>

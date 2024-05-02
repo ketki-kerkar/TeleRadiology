@@ -86,17 +86,16 @@ function PatientCard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/doctor/viewList/ofPatients', {
-          params: {
-            email: patientEmail,
-            caseId: caseId
-          },
+        const response = await axios.post(' http://localhost:9191/api/v1/doctor/findUser/ByEmail',{email: patientEmail},{
           headers: {
             Authorization: `Bearer ${authToken}`
           }
-        }); 
-        const patient = response.data[0];
-        setPatientDetails(patient);
+        });
+        const patient = response.data;
+        console.log(patient);
+
+        setPatientDetails(patient.patients[0]);
+        
         if (patient.prescriptionTests) {
           setPrescription(patient.prescriptionTests);
           setPrescriptionExists(true);
@@ -108,6 +107,7 @@ function PatientCard() {
     };
     fetchData();
   }, [authToken, patientEmail, caseId]);
+        
 
   const handlePrescriptionChange = (event) => {
     setPrescription(event.target.value);
@@ -165,12 +165,8 @@ function PatientCard() {
   
   const handleSeveritySubmit = () => {
     setSubmittingSeverity(true);
-    const formData = {
-      caseId: caseId,
-      isSevere: severity
-    };
    
-    axios.post('http://localhost:9191/api/v1/doctor/add-severity' , formData, {
+    axios.post('http://localhost:9191/api/v1/doctor/add-severity', {caseId : severity} , {
       headers: {
         Authorization: `Bearer ${authToken}`
       }
@@ -244,7 +240,7 @@ function PatientCard() {
               Blood Group: {patientDetails.bloodGroup || 'O+ve'}
             </Typography>
             <Typography variant="h6"  gutterBottom>
-              History: {patientDetails.Hitory || 'No history to display'}
+              History: {patientDetails.History || 'No history to display'}
             </Typography>
             <Typography variant="h6"  gutterBottom>
               Date Of Registration: {patientDetails.dateOfRegistration || '22/02/24' }
@@ -378,6 +374,7 @@ function PatientCard() {
                   <FormControl fullWidth variant="outlined" sx={{
                         textAlign:'left',
                         backgroundColor: '#fff',
+                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                         '& .MuiInputLabel-root': { color: '#000' },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: '#000', borderRadius: '4px' },
@@ -420,21 +417,6 @@ function PatientCard() {
                   </Snackbar>
                 </Box>
                   </FormControl>
-                <Typography variant='h6' sx={{textAlign: 'left'}}>Navigate To View Reports and Chats</Typography>
-                <Link to={{ 
-                          pathname: '/doctor/listPatients/patientdetails/chat', 
-                          search: `?caseId=${caseId}&doctorEmail=${doctorEmail}&patientEmail=${patientEmail}`
-                        }} 
-                        style={{textDecoration:'none'}}
-                        
-                      >
-                        <Button 
-                          variant="contained" 
-                          style={{ display: 'flex', justifyContent:'flex-start', marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' ,}}
-                        >
-                          VIEW REPORT AND CHAT
-                        </Button>
-                        </Link>
                   
               </Grid>
                 
