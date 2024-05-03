@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AnnotatedImageRequest {
     private String annotatedImageBase64;
-    private Long radiologistId;
+    private String radiologistEmail;
     private Long caseId;
     private String finalRemarks;
 }

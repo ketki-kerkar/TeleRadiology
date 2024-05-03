@@ -89,9 +89,13 @@ public class RadiologistController {
         if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
             return ResponseEntity.badRequest().body(null);
         }
-        annotatedImageService.uploadAnnotations(request);
-        //logger.info("Uploaded annotated Images  successfully");
-        return new ResponseEntity<>("Uploaded annotated Images successfully", HttpStatus.OK);
+        ResponseEntity<String> response= annotatedImageService.uploadAnnotations(request);
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            return new ResponseEntity<>("Uploaded annotated Images successfully", HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("Upload not successful", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
