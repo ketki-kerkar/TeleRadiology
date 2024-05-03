@@ -61,6 +61,8 @@ public class DoctorController {
     private HospitalHandleRepo hospitalHandleRepo;
     @Autowired
     private FindUser findUser;
+    @Autowired
+    private GetJsonUrlService getJsonUrlService;
 
     @PutMapping("/add-case-summary")
     public ResponseEntity<String> AddCaseSummary(
@@ -146,6 +148,17 @@ public class DoctorController {
         }
         addSeverityService.addSeverity(request);
         return new ResponseEntity<>("Severity added successfully", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/get-json-aws-url")
+    public ResponseEntity<String> getJsonUrl(@RequestParam Long caseId){
+        ResponseEntity<String> response=getJsonUrlService.getUrl(caseId);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return ResponseEntity.ok(response.getBody());
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/ask-consent")
