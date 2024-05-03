@@ -85,6 +85,20 @@ public class DoctorController {
         }
 
     }
+    @GetMapping("/get-case-summary")
+    public ResponseEntity<String> GetCaseSummary(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam Long caseId){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return null;
+        }
+        try {
+            return caseSummaryService.getCaseSummary(caseId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching the case summary");
+        }
+    }
     @GetMapping("/get-prescription")
     public String getPrescription(@RequestHeader(name = "Authorization") String token, @RequestParam Long caseId){
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix

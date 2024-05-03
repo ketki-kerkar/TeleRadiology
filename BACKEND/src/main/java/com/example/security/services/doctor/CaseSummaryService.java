@@ -25,4 +25,13 @@ public class CaseSummaryService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Case summary not added");
 
     }
+    public ResponseEntity<String> getCaseSummary(Long caseId){
+        Optional<Case> caseOptional=caseRepo.findById(caseId);
+        if (caseOptional.isPresent()){
+            Case caseObj=caseOptional.get();
+            String caseSummary= caseObj.getCaseSummary();
+            return ResponseEntity.ok(caseSummary);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Case not found");
+    }
 }
