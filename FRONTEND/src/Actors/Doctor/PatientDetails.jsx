@@ -8,6 +8,7 @@ import { useLocation , Link} from 'react-router-dom';
 
 
 
+
 const theme = createTheme({
   palette: {
     secondary: {
@@ -81,64 +82,107 @@ function PatientCard() {
   const patientEmail = queryParams.get('email');
   const caseId = queryParams.get('caseId');
   const doctorEmail = localStorage.getItem('userEmail');
-  
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPatientData = async () => {
       try {
-        const response = await axios.post(' http://localhost:9191/api/v1/doctor/findUser/ByEmail',{email: patientEmail},{
+        const response = await axios.post('http://localhost:9191/api/v1/doctor/findUser/ByEmail', { email: patientEmail }, {
           headers: {
             Authorization: `Bearer ${authToken}`
           }
         });
-        const patient = response.data;
-        console.log(patient);
+        const patient = response.data.patients[0];
+      
 
-        setPatientDetails(patient.patients[0]);
-        
-        if (patient.prescriptionTests) {
-          setPrescription(patient.prescriptionTests);
-          setPrescriptionExists(true);
-          localStorage.setItem('prescription', patient.prescriptionTests); // Store prescription in local storage
+        if (patient.patients && patient.patients.length > 0) {
+          setPatientDetails(patient);
+          if (patient.prescriptionTests) {
+            setPrescription(patient.prescriptionTests);
+            setPrescriptionExists(true);
+          }
         }
       } catch (error) {
-        console.log(error);
-      } 
+        console.log('Error fetching patient data:', error);
+      }
     };
-    fetchData();
-  }, [authToken, patientEmail, caseId]);
-        
+
+    if (authToken && patientEmail) {
+      fetchPatientData();
+    }
+  }, [authToken, patientEmail]);
+
+  useEffect(() => {
+    const fetchPrescription = async () => {
+      try {
+        const response = await axios.get(`http://localhost:9191/api/v1/doctor/get-prescription?caseId=${caseId}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
+        const prescriptionTests  = response.data;
+        console.log(prescriptionTests);
+    
+        if (prescriptionTests) {
+          setPrescription(prescriptionTests);
+          setPrescriptionExists(true); // Enable/disable button based on existence of prescription
+        } else {
+          setPrescriptionExists(false);
+        }
+      } catch (error) {
+        console.error('Error fetching prescription:', error);
+      }
+    };
+    if (caseId) {
+      fetchPrescription();
+    }
+  }, [authToken, caseId]);
+
+  useEffect(() => {
+  const fetchCaseSummary = async () => {
+    try {
+      const response = await axios.get(`http://localhost:9191/api/v1/doctor/get-case-summary?caseId=${caseId}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      const caseSummary  = response.data;
+  
+      if (caseSummary) {
+        setCaseSummary(caseSummary);
+      } 
+    } catch (error) {
+      console.error('Error fetching pCase Summary:', error);
+    }
+  };
+  if (caseId) {
+    fetchCaseSummary();
+  }
+}, [authToken, caseId]);
 
   const handlePrescriptionChange = (event) => {
     setPrescription(event.target.value);
-    localStorage.setItem('prescription', event.target.value); 
   };
+
+  const handlePrescriptionSubmit = async () => {
+    try {
+      const formData = {
+        caseId: caseId,
+        prescriptionTests: prescription,
+      };
+      await axios.post('http://localhost:9191/api/v1/doctor/add-prescription', formData, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      console.log('Prescription added successfully!');
+    } catch (error) {
+      console.error('Error adding prescription:', error);
+    }
+  }
+    
 
   const handleCaseSummaryChange = (event) => {
     setCaseSummary(event.target.value);
-    localStorage.setItem('caseSummary', event.target.value); 
-  };
-
-  const handlePrescriptionSubmit = () => {
-    setSubmitting(true);
-    const formData = {
-      caseId: caseId,
-      prescriptionTests: prescription,
-    };
-    axios.post('http://localhost:9191/api/v1/doctor/add-prescription', formData, {
-      headers: {
-        Authorization: `Bearer ${authToken}`
-      }
-    })
-    .then(response => {
-      setSubmitting(false);
-      setSuccessAlertOpen(true);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setSubmitting(false);
-      setErrorAlertOpen(true);
-    });
   };
 
   const handleCaseSummarySubmit = () => {
@@ -264,37 +308,44 @@ function PatientCard() {
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    id="prescription"
-                    label="Prescription Of Imaging Tests"
-                    name="prescription"
-                    multiline
-                    rows={5}
-                    value={prescription}
-                    onChange={handlePrescriptionChange}
-                    disabled={prescriptionExists} 
-                      sx={{
-                        backgroundColor: '#fff',
-                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                        '& .MuiInputLabel-root': { color: '#000' },
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: '#000', borderRadius: '4px' },
-                          '&:hover fieldset': { borderColor: '#000' },
-                          '&.Mui-focused fieldset': { borderColor: '#000' },
-                        },
-                        width: '100%',
-                      }}
-                    />
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        id="prescription"
+                        label="Prescription Of Imaging Tests"
+                        name="prescription"
+                        multiline
+                        rows={5}
+                        value={prescription}
+                        onChange={handlePrescriptionChange}
+                        disabled={prescriptionExists}
+                        sx={{
+                          backgroundColor: '#fff',
+                          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                          '& .MuiInputLabel-root': { color: '#000' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: '#000', borderRadius: '4px' },
+                            '&:hover fieldset': { borderColor: '#000' },
+                            '&.Mui-focused fieldset': { borderColor: '#000' },
+                          },
+                          width: '100%',
+                        }}
+                      />
                     <Grid>
-                    <Button 
-                      variant="contained" 
-                      style={{ display: 'flex', justifyContent:'flex-start', marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }} 
-                      onClick={handlePrescriptionSubmit} 
-                      disabled={submitting}
-                      
-                    >
+                    <Button
+                        variant="contained"
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                          marginTop: '20px',
+                          backgroundColor: prescriptionExists ? '#ccc' : '#1976d2',
+                          color: '#fff',
+                          borderRadius: '5px'
+                        }}
+                        onClick={handlePrescriptionSubmit}
+                        disabled={submitting || prescriptionExists}
+                      >
+
                       {submitting ? 'Saving...' : 'Save Prescription'}
                     </Button>
                   <Snackbar open={successAlertOpen} autoHideDuration={6000} onClose={handleCloseSuccessAlert}>
@@ -417,6 +468,21 @@ function PatientCard() {
                   </Snackbar>
                 </Box>
                   </FormControl>
+                  <Typography variant='h6' sx={{textAlign: 'left'}}>Navigate To View Reports and Chats</Typography>
+                <Link to={{ 
+                          pathname: '/doctor/listPatients/patientdetails/chat', 
+                          search: `?caseId=${caseId}&doctorEmail=${doctorEmail}&patientEmail=${patientEmail}`
+                        }} 
+                        style={{textDecoration:'none'}}
+
+                      >
+                        <Button 
+                          variant="contained" 
+                          style={{ display: 'flex', justifyContent:'flex-start', marginTop: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' ,}}
+                        >
+                          VIEW REPORT AND CHAT
+                        </Button>
+                        </Link>
                   
               </Grid>
                 
