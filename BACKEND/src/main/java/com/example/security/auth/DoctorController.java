@@ -102,12 +102,16 @@ public class DoctorController {
         }
     }
     @GetMapping("/get-prescription")
-    public String getPrescription(@RequestHeader(name = "Authorization") String token, @RequestParam Long caseId){
+    public ResponseEntity<String> getPrescription(@RequestHeader(name = "Authorization") String token, @RequestParam Long caseId){
         String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
         if (userEmail == null) {
             return null;
         }
-        return prescriptionService.getPrescription(caseId);
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"doctor".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        return ResponseEntity.ok(prescriptionService.getPrescription(caseId));
     }
 
     @PostMapping("/add-prescription")

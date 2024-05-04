@@ -27,9 +27,9 @@ public class AnnotatedImageService {
     @Autowired
     private DoctorRepo doctorRepo;
 
-    public ResponseEntity<String> uploadAnnotations(AnnotatedImageRequest request){
+    public ResponseEntity<String> uploadAnnotations(AnnotatedImageRequest request,String email){
 
-        Optional<Doctor> doctorOptional=doctorRepo.findByDoctorEmail(request.getRadiologistEmail());
+        Optional<Doctor> doctorOptional=doctorRepo.findByDoctorEmail(email);
 
         Doctor doctor=doctorOptional.get();
         Optional<Case> caseOptional=caseRepo.findById(request.getCaseId());
