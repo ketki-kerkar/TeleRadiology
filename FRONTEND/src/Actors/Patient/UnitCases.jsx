@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, styled } from '@mui/material'; // Import styled from @mui/material
+import { Box, Button, styled, TextField } from '@mui/material'; // Import styled from @mui/material
 import './UnitCases.css'; // Import your CSS file for styling
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import CssBaseline from '@mui/material/CssBaseline';
 
 // Style the Button component using the styled function
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -18,47 +19,79 @@ function UnitCases() {
   const [userData, setUserData] = useState(null); // Initialize userData state with null
   const [error, setError] = useState(null); // Initialize error state with null
   const [isLoading, setIsLoading] = useState(true);
+  const [additionalInfo, setAdditionalInfo] = useState('');
   const location = useLocation(); // Get location object from useLocation
-  
-  // Extract caseId from location state
-  const { state: { caseId } } = location;
-  useEffect(() => {
-    // Simulate loading delay
-    const delay = setTimeout(() => {
-      setIsLoading(false); // Set isLoading to false after delay
-    }, 2000); // Simulate 2 seconds loading delay
 
-    // Clear the timeout to prevent memory leaks
-    return () => clearTimeout(delay);
-  }, []);
+  // Extract caseId from location state
+  const caseId = location.state?.caseId || ''; // Use optional chaining to avoid null or undefined
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:9191/api/v1/patient/viewCase', {caseId}); // Provide the API endpoint to fetch unit cases
-        // Check if response data is not null or undefined before setting state
+        const authToken = localStorage.getItem('authToken');
+        const response = await axios.post('http://localhost:9191/api/v1/patient/viewCase', {
+          caseId: caseId // sending caseId in the body of the request
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`
+          }
+        });
         if (response.data) {
+          // Format the date here
+          response.data.caseRegistrationDate = formatDate(response.data.caseRegistrationDate);
           setUserData(response.data);
           setError(null);
         } else {
-          // Handle case where response data is null or undefined
           setError('Unit cases data not found');
           setUserData(null);
         }
       } catch (error) {
         console.error('Error fetching unit cases:', error);
-        // Handle error, set error state
         setError('An error occurred while fetching unit cases');
         setUserData(null);
+      } finally {
+        setIsLoading(false); // Set isLoading to false after fetching data
       }
     };
 
     fetchData();
   }, [caseId]);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleDateString('en-GB'); // Format as dd-mm-yyyy
+    return formattedDate;
+  };
+
+  const handleViewPrescription = async () => {
+    console.log("View button clicked"); // Add this line
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await axios.get(`http://localhost:9191/api/v1/patient/get-prescription?caseId=${caseId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (response.data) {
+        setAdditionalInfo(response.data);
+        console.log("Additional info:", response.data); // Add this line
+      } else {
+        setError('Prescription data not found');
+        setAdditionalInfo('');
+      }
+    } catch (error) {
+      console.error('Error fetching prescription:', error);
+      setError('An error occurred while fetching prescription');
+      setAdditionalInfo('');
+    }
+  };
+
   return (
     <div>
       <Navbar userRole="patient" />
+      <CssBaseline/>
       <div className="content">
         <Box
           display="flex"
@@ -72,36 +105,47 @@ function UnitCases() {
           {/* Left side content */}
           <div className="left-half">
             {/* Display static unit cases data */}
-            {isLoading ? (
-              <h2>Loading...</h2>
-            ) : (
-              <>
-                <ul className="individual-case-container">
-                  {/* Display userData if available */}
-                  {userData && (
-                    <li>
-                      <h2> Case ID: {userData.caseId}</h2>
-                      <p>Date: {userData.caseRegistrationDate}</p>
-                      <p>Doctor Name: {userData.dName}</p>
-                      <p>Hospital Name: {userData.hospitalName}</p>
-                      <p>Case Status : {userData.caseStatus}</p>
-                    </li>
-                  )}
-                </ul>
-              </>
+            {userData && (
+              <ul className="individual-case-container">
+                <li>
+                  <h2> Case ID: {userData.caseId}</h2>
+                  <p>Date: {userData.caseRegistrationDate}</p>
+                  <p>Doctor Name: {userData.dname}</p>
+                  <p>Hospital Name: {userData.hospitalName}</p>
+                  <div
+                    style={{
+                    border: '1px solid #ccc',
+                    padding: '1rem',
+                    marginTop: '1rem',
+                    minHeight: '100px',
+                    overflowY: 'auto',
+                    }}
+                  >
+                    {additionalInfo !== '' ? (
+                      <pre>
+                        {additionalInfo.split(',').map((item, index) => (
+                          <div key={index}>
+                            <span>{index + 1})</span> {item.trim()}
+                          </div>
+                        ))}
+                      </pre>
+                    ) : (
+                      <p><h4>PRESCRIPTION</h4></p>
+                    )}
+                  </div>
+                </li>
+              </ul>
             )}
           </div>
 
           {/* Vertical dividing line */}
           <div className="vertical-line"></div>
-
           {/* Right side content */}
           <div className="right-half">
             <div className="prescription-box">
               <h2>Prescription</h2>
               <div className="button-container">
-                <StyledButton variant="contained">View</StyledButton>
-                <StyledButton variant="contained">Download</StyledButton>
+                <StyledButton variant="contained" onClick={handleViewPrescription}>View</StyledButton>
               </div>
             </div>
             <hr className="horizontal-line" /> {/* Horizontal grey line */}
@@ -128,5 +172,3 @@ function UnitCases() {
 }
 
 export default UnitCases;
-
-

@@ -8,6 +8,7 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import InsightsIcon from '@mui/icons-material/Insights';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import WavingHandRoundedIcon from '@mui/icons-material/WavingHandRounded';
+import { CssBaseline } from '@mui/material';
 
 export default function PatientHome() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,6 +24,7 @@ export default function PatientHome() {
     return (
         <div style={{ backgroundColor: '#fff' }}>
             <Navbar userRole="patient" isSidebarOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
+            <CssBaseline />
             <Container maxWidth="xl">
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
                     <Grid item xs={12}>
@@ -113,10 +115,6 @@ export default function PatientHome() {
         </div>
     );
 }
-
-
-
-
 
 
 
