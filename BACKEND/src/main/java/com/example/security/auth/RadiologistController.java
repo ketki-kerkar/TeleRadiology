@@ -115,8 +115,7 @@ public class RadiologistController {
         ResponseEntity<String> response=getJsonUrlService.getUrl(caseId);
 
         return ResponseEntity.ok(response.getBody());
-
-
+        
     }
 
 
