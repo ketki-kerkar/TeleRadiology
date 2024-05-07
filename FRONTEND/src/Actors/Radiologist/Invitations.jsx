@@ -192,4 +192,4 @@ const Invitations = () => {
   );
 };
 
-export default Invitations
+export default Invitations;
