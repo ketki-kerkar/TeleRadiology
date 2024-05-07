@@ -7,7 +7,7 @@ import Navbar from '../../Components/Navbar';
 import Button from '@mui/material/Button';
 import axios from 'axios';
 import { useContext } from 'react';
-import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext'; 
 
 const containerStyle = {
   display: 'flex',
@@ -70,7 +70,7 @@ const buttonStyle = {
 };
 
 const Consent = () => {
-const { loggedinUser } = useContext(LoggedInUserContext);
+  const { loggedinUser } = useContext(LoggedInUserContext);
   const authToken = loggedinUser.token;
   const [invitations, setInvitations] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -78,20 +78,21 @@ const { loggedinUser } = useContext(LoggedInUserContext);
   const [senderEmail, setSenderEmail] = useState("");
   const [selectedCardId, setSelectedCardId] = useState(null); // New state to hold the selected card ID
   const [selectedConsentCard, setSelectedConsentCard] = useState(null);
-  const email= loggedinUser.email;
 
   useEffect(() => {
-    if (email && authToken) {
-      setSenderEmail(loggedinUser.email);
+    // Fetch logged-in user's email and authToken from local storage
+    const loggedInEmail = localStorage.getItem('LoggedInEmail');
+    console.log('loggedInEmail:', loggedInEmail);
+    if (loggedInEmail && authToken) {
+      setSenderEmail(loggedInEmail);
     }
-  }, []); 
-
+  }, []); // Run this effect only once on component mount
 
   const handleNotificationButtonClick = async () => {
     try {
       const response = await axios.post(
         'http://localhost:9191/api/v1/notification/list-notifications',
-        { email: email },
+        { email: senderEmail },
         { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
       );
       setInvitations(response.data);
@@ -105,7 +106,7 @@ const { loggedinUser } = useContext(LoggedInUserContext);
     try {
       const response = await axios.post(
         'http://localhost:9191/api/v1/patient/consent-details',
-        { email: email },
+        { email: senderEmail },
         { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
       );
       setConsentCards(response.data);
@@ -121,7 +122,7 @@ const { loggedinUser } = useContext(LoggedInUserContext);
         const { caseId } = selectedConsentCard;
         await axios.post(
           'http://localhost:9191/api/v1/patient/sendNotifications',
-          { caseId, receiverEmail: selectedConsentCard.email, email},
+          { caseId, receiverEmail: selectedConsentCard.email, senderEmail },
           { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
         );
         console.log('Selected consent card sent to the backend:', { caseId, receiverEmail: selectedConsentCard.email, senderEmail });
