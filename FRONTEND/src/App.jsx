@@ -138,7 +138,7 @@ function App() {
                 <Route path='/radiologist/viewInvitations' element={<ProtectedRoute pathRole="radiologist"><Invitations/></ProtectedRoute>}/>
               </>
 
-            {/* Patient Routes */}
+            {/* Patient Routes *************************/}
             <>
                   <Route path="/patient" element={<ProtectedRoute pathRole="patient"><PatientHome /></ProtectedRoute>} />
                   <Route path="/patient/viewCase" element={<ProtectedRoute pathRole="patient"><ViewCase/></ProtectedRoute>} />
