@@ -38,7 +38,7 @@ export default function ViewCase() {
     };
 
     const handleNavigateToUnitCases = (caseId) => {
-        navigate(`/patient/viewCase/unitCases`, { state: { caseId } });
+        navigate(/patient/viewCase/unitCases, { state: { caseId } });
     };
 
     useEffect(() => {
@@ -93,7 +93,6 @@ export default function ViewCase() {
         </div>
     );
 }
-
 
 
 

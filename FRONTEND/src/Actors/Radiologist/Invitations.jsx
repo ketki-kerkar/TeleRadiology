@@ -6,15 +6,16 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const cardStyle = {
   marginTop: '20px',
-  width: '56vw', // Set card width
-  height: '30vh', // Set card height
+  width: '56vw',
+  height: '30vh',
   textAlign: 'left',
-  fontFamily: '"Quicksand", sans-serif', // Add the font family here
+  fontFamily: '"Quicksand", sans-serif',
   background: '#F0F7F9',
-  boxShadow: 'none', // remove shadows
+  boxShadow: 'none',
   justifyContent: 'center',
 };
 
@@ -43,12 +44,12 @@ const buttonStyle = {
 const viewButtonStyle = {
   textAlign: 'center',
   margin: '1vw',
-  backgroundColor: '#3f51b5', // Changed to blue color
+  backgroundColor: '#3f51b5',
   fontFamily: '"Quicksand", sans-serif',
   width: '8vw',
   fontSize: '0.9vw',
-  color: '#fff', // Changed text color to white
-  borderColor: '#3f51b5', // Matching border color with background color
+  color: '#fff',
+  borderColor: '#3f51b5',
   padding: '1vh'
 };
 
@@ -65,15 +66,23 @@ const rejectButtonStyle = {
 };
 
 const Invitations = () => {
-  const [invitations, setInvitations] = useState([
-    { id: 1, senderName: "Dr. Hermione Granger", caseSummary: "A 55-year-old male, presents with persistent lower back pain...", caseId: 123 },
-    { id: 2, senderName: "Dr. Lord Voldemort", caseSummary: "A 42-year-old female, presents with persistent abdominal pain...", caseId: 456 },
-  ]);
+  const authToken = localStorage.getItem('authToken');
+  const LoggedInEmail = localStorage.getItem('LoggedInEmail');
+  const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
     const fetchInvitations = async () => {
+      console.log(LoggedInEmail)
       try {
-        const response = await axios.post('/list', { email: 'example@example.com' });
+        const response = await axios.post(
+          'http://localhost:9191/api/v1/radiologist/list',
+          { email: LoggedInEmail },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
         setInvitations(response.data);
       } catch (error) {
         console.error('Error fetching invitations:', error);
@@ -81,44 +90,48 @@ const Invitations = () => {
     };
 
     fetchInvitations();
-  }, []);
+  }, [authToken, LoggedInEmail]);
 
-  const handleAcceptClick = async (invitationId, index) => {
+  const handleAcceptClick = async (invitationId, caseId) => {
     try {
-      // Make an API call to accept the invitation
-      await axios.post('/accept', { email: 'example@example.com', choice: 'Accepted', caseId: invitationId });
-      
-      // Update the invitation status locally (assuming you have an invitation status field)
+      await axios.post(
+        'http://localhost:9191/api/v1/radiologist/accept-invitation',
+        { email: LoggedInEmail, choice: 'Accepted', caseId: caseId },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
       const updatedInvitations = [...invitations];
-      updatedInvitations[index].status = 'Accepted';
+      const invitationIndex = updatedInvitations.findIndex(invitation => invitation.invitationId === invitationId);
+      updatedInvitations[invitationIndex].invitation_status = 'Accepted';
       setInvitations(updatedInvitations);
-      
-      console.log('Invitation accepted successfully!');
     } catch (error) {
       console.error('Error accepting invitation:', error);
     }
   };
-
-  const handleRejectClick = async (invitationId) => {
+  
+  const handleRejectClick = async (invitationId, caseId) => {
     try {
-      // Make an API call to reject the invitation
-      await axios.post('/reject', { email: 'example@example.com', choice: 'Rejected', caseId: invitationId });
-      
-      // If the backend responds with success, remove the rejected invitation from the local state
-      const updatedInvitations = invitations.filter(invitation => invitation.id !== invitationId);
-      setInvitations(updatedInvitations);
-      
-      console.log('Invitation rejected successfully!');
+      await axios.post(
+        'http://localhost:9191/api/v1/radiologist/accept-invitation',
+        { email: LoggedInEmail, choice: 'Rejected', caseId: caseId },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      window.location.reload();
     } catch (error) {
       console.error('Error rejecting invitation:', error);
     }
-  };
+  };  
 
   const handleViewClick = async (invitationId) => {
     try {
-      // Make an API call to view the case details
       await axios.post('/view-case', { caseId: invitationId });
-      
       console.log('Viewing case details...');
     } catch (error) {
       console.error('Error viewing case details:', error);
@@ -128,9 +141,10 @@ const Invitations = () => {
   return (
     <div>
       <Navbar userRole="radiologist" />
+      <CssBaseline/>
       <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', background: 'white' }}>
         <Grid container spacing={3}>
-          {invitations.map((invitation, index) => (
+          {invitations.map((invitation) => (
             <Grid item xs={12} key={invitation.id} style={{ display: 'flex', justifyContent: 'center' }}>
               <Card style={cardStyle}>
                 <CardContent>
@@ -142,30 +156,32 @@ const Invitations = () => {
                   </Typography>
                 </CardContent>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                  {invitation.status !== 'Accepted' ? (
-                    <Button 
-                      variant="outlined" 
-                      style={buttonStyle} 
-                      onClick={() => handleAcceptClick(invitation.id, index)}
-                    >
-                      Accept
-                    </Button>
+                  {invitation.invitation_status !== 'Accepted' ? (
+                    <>
+                      <Button 
+                        variant="outlined" 
+                        style={buttonStyle} 
+                        onClick={() => handleAcceptClick(invitation.invitationId, invitation.caseId)}
+                      >
+                        Accept
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        style={rejectButtonStyle} 
+                        onClick={() => handleRejectClick(invitation.invitationId, invitation.caseId)}
+                      >
+                        Reject
+                      </Button>
+                    </>
                   ) : (
                     <Button 
                       variant="outlined" 
                       style={viewButtonStyle} 
-                      onClick={() => handleViewClick(invitation.id)}
+                      onClick={() => handleViewClick(invitation.invitationId)}
                     >
                       View
                     </Button>
                   )}
-                  <Button 
-                    variant="outlined" 
-                    style={rejectButtonStyle} 
-                    onClick={() => handleRejectClick(invitation.id)}
-                  >
-                    Reject
-                  </Button>
                 </div>
               </Card>
             </Grid>
@@ -176,4 +192,4 @@ const Invitations = () => {
   );
 };
 
-export default Invitations;
+export default Invitations

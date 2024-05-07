@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '../../Components/Navbar';
 import logo from '../../Images/reception.jpg';
@@ -8,7 +7,7 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import InsightsIcon from '@mui/icons-material/Insights';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import WavingHandRoundedIcon from '@mui/icons-material/WavingHandRounded';
-import { CssBaseline } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 
 export default function PatientHome() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,9 +21,10 @@ export default function PatientHome() {
     };
 
     return (
+        <div>
+      <Navbar userRole="patient"/>
+      <CssBaseline />
         <div style={{ backgroundColor: '#fff' }}>
-            <Navbar userRole="patient" isSidebarOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
-            <CssBaseline />
             <Container maxWidth="xl">
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
                     <Grid item xs={12}>
@@ -113,8 +113,8 @@ export default function PatientHome() {
                 </Grid>
             </Container>
         </div>
+        </div>
     );
 }
-
 
 

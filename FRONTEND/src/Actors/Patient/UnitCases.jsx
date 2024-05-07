@@ -29,7 +29,7 @@ function UnitCases() {
     const fetchData = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
-        const response = await axios.post('http://localhost:9191/api/v1/patient/viewCase', {
+        const response = await axios.post(`http://localhost:9191/api/v1/patient/viewCase`, {
           caseId: caseId // sending caseId in the body of the request
         }, {
           headers: {
@@ -146,6 +146,7 @@ function UnitCases() {
               <h2>Prescription</h2>
               <div className="button-container">
                 <StyledButton variant="contained" onClick={handleViewPrescription}>View</StyledButton>
+                
               </div>
             </div>
             <hr className="horizontal-line" /> {/* Horizontal grey line */}
