@@ -28,6 +28,19 @@ function Navbar({ userRole }) {
 
   const userSidebarData = SidebarData[userRole] || [];
 
+  const handleNotificationClick = () => {
+    let notificationRoute = '/';
+    if (userRole === 'patient') {
+      notificationRoute = '/patient/consents';
+    } else if (userRole === 'doctor') {
+      notificationRoute = '/doctor/notifications';
+    } else if (userRole === 'radiologist') {
+      notificationRoute = '/radiologist/invitations';
+    }
+    navigate(notificationRoute);
+  };
+
+
   return (
     <>
       <IconContext.Provider value={{ color: '#000' }}>
@@ -38,7 +51,7 @@ function Navbar({ userRole }) {
           <ListItem><img src={logo} alt='RadilogyPlus' style={{ height: '50px', width: 'auto' }} /></ListItem> {/* Use the imported logo */}
           <Box display="flex" alignItems="center" justifyContent="flex-end" className='box'>
             <IconButton>
-              <NotificationsNoneIcon fontSize='large' />
+              <NotificationsNoneIcon fontSize='large' onClick={() => handleNotificationClick()}/>
             </IconButton>
             <IconButton>
               <AccountCircleOutlinedIcon fontSize='large' />

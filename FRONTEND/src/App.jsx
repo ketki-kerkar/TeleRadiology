@@ -39,7 +39,8 @@ import OTPgen from "./Components/OTPgen";
 import NewPassAfterOtp from "./Components/NewPassAfterOtp";
 import LaunchComplaint from "./Actors/Patient/LaunchComplaint";
 import Invitations from "./Actors/Radiologist/Invitations";
-import Notifications from "./Actors/Radiologist/Invitations";
+import Notification from "./Actors/Doctor/Notification"
+import Consent from "./Actors/Patient/Consent";
 
 function App() {
   const data = JSON.parse(window.sessionStorage.getItem("loggedInUser"));
@@ -75,7 +76,11 @@ function App() {
           <Routes>
             <Route exact path="/" element={<LoginComponent />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/otpGen" element={<OTPgen/>}/>
+            <Route path="/newPass" element={<NewPassAfterOtp/>}/>
             <Route path="/login" element={<LoginComponent/>}/>
+           
             
             {/* Admin Routes */}
               <>
@@ -103,7 +108,9 @@ function App() {
                 <Route path="/doctor/listPatients" element={ <ProtectedRoute pathRole="doctor"> <ListPatients /> </ProtectedRoute> } />
                 <Route path="/doctor/listPatients/patientdetails" element={ <ProtectedRoute pathRole="doctor"> <PatientDetails /> </ProtectedRoute> } />
                 <Route path="/doctor/listDoctors" element={ <ProtectedRoute pathRole="doctor"> <ListDoctors /> </ProtectedRoute> } />
-                <Route path="/doctor/notifications" element={<ProtectedRoute pathRole="doctor"> <Notification/></ProtectedRoute>}/>
+
+                <Route path="/doctor/notifications" element={<Notification />} />
+        
               </>
 
             {/* Lab Routes */}
@@ -125,21 +132,20 @@ function App() {
               <>
                 <Route exact path="/radiologist" element={<ProtectedRoute pathRole="radiologist"><RadiologistHome /></ProtectedRoute>} />
                 <Route path="/radiologist/changePassword" element={<ProtectedRoute pathRole="radiologist"><ChangePassword userRole="radiologist" /></ProtectedRoute>} />
-                <Route path="/radiologist/invitations" element={<ProtectedRoute pathRole="radiologist"><Invitations userRole="radiologist" /></ProtectedRoute>} />
+                
+                <Route path="/radiologist/invitations" element={<Invitations />} />
               </>
 
             {/* Patient Routes */}
-            <>
-                <Route exact path="/patient" element={<ProtectedRoute pathRole="patient"><PatientHome /></ProtectedRoute>} />
-                <Route path="/patient/viewCase" element={<ProtectedRoute pathRole="patient"><ViewCase userRole="patient" /></ProtectedRoute>} />
-                <Route path="/patient/viewCase/unitCases" element={<ProtectedRoute pathRole="patient"><UnitCases userRole="patient" /></ProtectedRoute>} />
-                <Route path="/patient/viewProfile" element={<ProtectedRoute pathRole="patient"><ViewProfile/></ProtectedRoute>} />
-                <Route path="/patient/viewPolicy" element={<ProtectedRoute pathRole="patient"><ViewPolicy/></ProtectedRoute>} />
-                <Route path="/patient/launchComplaint" element={<ProtectedRoute pathRole="patient"><LaunchComplaint/></ProtectedRoute>} />
-                <Route path="/otpGen" element={<OTPgen/>}/>
-                <Route path="/newPass" element={<NewPassAfterOtp/>}/>
-                <Route path="/patient/changePassword" element={ <ProtectedRoute pathRole="patient"> <ChangePassword /> </ProtectedRoute> } />
-                <Route path="/patient/consents" element={ <ProtectedRoute pathRole="patient"> <Consent /> </ProtectedRoute> } />
+              <>
+                <Route exact path="/patient" element={<PatientHome />} />
+                <Route path="/patient/viewCase" element={<ViewCase  />} />
+                <Route path="/patient/viewCase/unitCases" element={<UnitCases  />} />
+                <Route path="/patient/viewProfile" element={<ViewProfile/>} />
+                <Route path="/patient/viewPolicy" element={<ViewPolicy/>} />
+                <Route path="/patient/launchComplaint" element={<LaunchComplaint/>} />
+                <Route path="/patient/changePassword" element={<ChangePassword /> } />
+                <Route path="patient/consents" element={<Consent/>}/>
               </>
               
           </Routes>
