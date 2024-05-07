@@ -15,4 +15,6 @@ public class CaseDetailsDTO {
     private String hospitalName;
     private Date caseRegistrationDate;
     private Boolean caseStatus;
+    private String email;
+    private String qualification ;
 }

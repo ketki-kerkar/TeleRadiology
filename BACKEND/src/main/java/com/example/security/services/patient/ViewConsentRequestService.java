@@ -54,8 +54,8 @@ public class ViewConsentRequestService {
         }
 
         // Update the consent status to "completed" so that while listing it can be removed
-        consent.setConsentStatus("completed");
-        consentRepo.save(consent); // Save the updated consent
+        //consent.setConsentStatus("completed");
+        //consentRepo.save(consent); // Save the updated consent
 
         // Get the list of radiologist IDs from the consent
         String listOfRadiologistIdString = consent.getListOfRadiologistId();
@@ -72,6 +72,8 @@ public class ViewConsentRequestService {
                 caseDetail.setCaseId(consent.getCases().getCaseId()); // Set the caseId for each doctor
                 caseDetail.setDName(doctor.getDName());
                 caseDetail.setHospitalName(doctor.getHospital().getHospitalName());
+                caseDetail.setEmail(doctor.getUser().getEmail());
+                caseDetail.setQualification(doctor.getQualification());
                 caseDetails.add(caseDetail);
             });
         }

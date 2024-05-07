@@ -11,8 +11,8 @@ import com.example.security.Model.Actors.Patient;
 import com.example.security.Model.Actors.User;
 import com.example.security.Model.Case;
 import com.example.security.Repositories.PatientRepo;
-import com.example.security.Repositories.UserRepo;
 import com.example.security.services.admin.FindUser;
+import com.example.security.Repositories.UserRepo;
 import com.example.security.services.doctor.DiagnosisPdfService;
 import com.example.security.services.doctor.PrescriptionService;
 import com.example.security.services.hospitalHandle.CaseService;
@@ -85,7 +85,17 @@ public class PatientController {
     }
 
     @PostMapping("/consent-details")
-    public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(@RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<List<CaseDetailsDTO>> getCaseDetailsByEmail(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody EmailRequest emailRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
             String email = emailRequest.getEmail();
 
@@ -102,8 +112,19 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Return 500 for internal server error
         }
     }
+
     @GetMapping("/get-diagnosis")
-    public ResponseEntity<InputStreamResource> getDiagnosis(@RequestParam Long caseId) throws IOException {
+    public ResponseEntity<InputStreamResource> getDiagnosis(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam Long caseId) throws IOException {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         ByteArrayInputStream pdf=diagnosisPdfService.getDiagnosis(caseId);
         HttpHeaders httpHeaders=new HttpHeaders();
         httpHeaders.add("Content-Disposition","inline;file=diagnosis.pdf");
@@ -111,20 +132,34 @@ public class PatientController {
                 headers(httpHeaders).
                 contentType(MediaType.APPLICATION_PDF).
                 body(new InputStreamResource(pdf));
-
-
     }
+
     @GetMapping("/get-prescription")
-    public String getPrescription(@RequestParam Long caseId){
-        String prescription=prescriptionService.getPrescription(caseId);
-        return  prescription;
+    public ResponseEntity<String> getPrescription(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam Long caseId) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().build(); // Return 400 if no user email found
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().build(); // Return 400 without a body
+        }
+        String prescription = prescriptionService.getPrescription(caseId);
+        return ResponseEntity.ok(prescription); // Return 200 with prescription
     }
+
     @GetMapping("/viewList/ofCases")
     public ResponseEntity<List<CaseDetailsDTO>> viewListOfCases(@RequestHeader(name = "Authorization") String token) {
         try {
             String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
             if (userEmail == null) {
                 return ResponseEntity.badRequest().build(); // Return 400 if no user email found
+            }
+            User user = userRepo.findByEmail(userEmail).orElse(null);
+            if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+                return ResponseEntity.badRequest().body(null);
             }
             List <CaseDetailsDTO> caseDetails = caseService.getCaseDetailsByEmail(userEmail)
                     .stream()
@@ -141,6 +176,7 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PostMapping("/viewCase")
     public ResponseEntity<CaseDetailsDTO> getCaseDetailsById(
             @RequestHeader(name = "Authorization") String token,
@@ -151,7 +187,10 @@ public class PatientController {
             if (userEmail == null) {
                 return ResponseEntity.badRequest().build();
             }
-
+            User user = userRepo.findByEmail(userEmail).orElse(null);
+            if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+                return ResponseEntity.badRequest().body(null);
+            }
             Long caseId = caseIdRequest.getCaseId();
             if (caseId == null) {
                 return ResponseEntity.badRequest().build();
@@ -170,7 +209,6 @@ public class PatientController {
     }
 
 
-
     private CaseDetailsDTO convertToDTO(Case caseEntity) {
         CaseDetailsDTO caseDTO = new CaseDetailsDTO();
         caseDTO.setCaseId(caseEntity.getCaseId());
@@ -186,9 +224,19 @@ public class PatientController {
         return caseDTO;
     }
     @PostMapping("/sendNotifications")
-    public ResponseEntity<String> sendInvitation(@RequestBody SelectingInvitationRequest selectingInvitationRequest) {
+    public ResponseEntity<String> sendInvitation(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody SelectingInvitationRequest selectingInvitationRequest) {
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"patient".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
-            selectingRadiologist.sendInvitation(selectingInvitationRequest.getCaseId(), selectingInvitationRequest.getEmail());
+            selectingRadiologist.sendInvitation(selectingInvitationRequest.getCaseId(), selectingInvitationRequest.getReceiverEmail() , selectingInvitationRequest.getSenderEmail());
             return new ResponseEntity<>("Invitation sent successfully", HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

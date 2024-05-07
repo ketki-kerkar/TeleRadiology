@@ -24,6 +24,7 @@ const ChatRoom = () => {
         message: '',
         caseId: initialCaseId
     });
+    console.log(email)
     const [pastMessages, setPastMessages] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [pageSize, setPageSize] = useState(10);

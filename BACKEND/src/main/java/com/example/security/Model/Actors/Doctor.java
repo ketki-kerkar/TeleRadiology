@@ -41,7 +41,7 @@ public class Doctor {
     @JoinColumn(name = "hospitalId", nullable = false)
     private HospitalHandle hospital;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
