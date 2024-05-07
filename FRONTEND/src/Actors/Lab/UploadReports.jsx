@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
-import { CssBaseline, Grid, TextField, Container, Typography } from '@mui/material';
+import { CssBaseline, Grid, TextField, Container, Typography, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText , Button} from '@mui/material';
 import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 function UploadReports() {
@@ -10,6 +10,7 @@ function UploadReports() {
   const [dicomFile, setDicomFile] = useState(null);
   const [jsonFile, setJsonFile] = useState(null);
   const [prescriptionId, setPrescriptionId] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
 
   const dicomInputRef = useRef(null);
   const jsonInputRef = useRef(null);
@@ -42,6 +43,7 @@ function UploadReports() {
     })
       .then(response => {
         console.log('Upload successful:', response.data);
+        setOpenDialog(true);
         // Handle success (e.g., show a success message)
       })
       .catch(error => {
@@ -53,6 +55,11 @@ function UploadReports() {
         // Handle error (e.g., show an error message)
       });
   };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    window.history.back();
+  };
+
 
   return (
     <div>
@@ -146,6 +153,24 @@ function UploadReports() {
           </Grid>
         </Grid>
       </Container>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Upload Successful</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            The Dicom and JSON File has been added successfully. Redirecting to homepage...
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
