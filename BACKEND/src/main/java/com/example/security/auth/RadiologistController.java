@@ -8,6 +8,7 @@ import com.example.security.DTOs.Requests.EmailRequest;
 import com.example.security.Model.Actors.User;
 import com.example.security.Model.AnnotatedImages;
 import com.example.security.Repositories.UserRepo;
+import com.example.security.services.doctor.GetJsonUrlService;
 import com.example.security.services.login.JwtService;
 import com.example.security.services.radiologist.AcceptingInvitationService;
 import com.example.security.services.radiologist.AnnotatedImageService;
@@ -34,6 +35,8 @@ public class RadiologistController {
     private JwtService jwtService;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private GetJsonUrlService getJsonUrlService;
 
     @PostMapping("/accept-invitation")
     public ResponseEntity<String> acceptInvitation(
@@ -96,6 +99,24 @@ public class RadiologistController {
         else {
             return new ResponseEntity<>("Upload not successful", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/get-json-aws-url")
+    public ResponseEntity<String> getJsonUrl(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam Long caseId){
+        String userEmail = jwtService.extractUsername(token.substring(7)); // Remove "Bearer " prefix
+        if (userEmail == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        User user = userRepo.findByEmail(userEmail).orElse(null);
+        if (user == null || !"radiologist".equals(user.getRole().getRoleName())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        ResponseEntity<String> response=getJsonUrlService.getUrl(caseId);
+
+        return ResponseEntity.ok(response.getBody());
+
+
     }
 
 
