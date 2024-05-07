@@ -5,6 +5,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from "../../Components/Navbar";
 import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const theme = createTheme({
   palette: {
@@ -27,8 +29,8 @@ const StyledForm = styled('form')(({ theme }) => ({
 }));
 
 export default function AddReceptionist() {
-  const authToken = localStorage.getItem('authToken');
-
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [hospitalName, setHospitalName] = useState("");
   const [nameError, setNameError] = useState(false);
   const [email, setEmail] = useState("");

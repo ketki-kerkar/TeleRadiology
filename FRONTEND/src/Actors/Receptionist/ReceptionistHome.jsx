@@ -2,12 +2,15 @@ import React from 'react';
 import Navbar from '../../Components/Navbar';
 import logo from '../../Images/reception.jpg';
 import logo2 from '../../Images/reception1.jpg';
-import { Container, Grid, Typography } from '@mui/material';
+import { Container, Grid, Typography ,CssBaseline} from '@mui/material';
 
 export default function ReceptionistHome() {
+  
   return (
-    <div style={{ backgroundColor: '#fff' }}>
+    <div>
       <Navbar userRole="receptionist"/>
+      <CssBaseline />
+
       <Container maxWidth="xl">
         <Grid container spacing={2} alignItems="center" justifyContent="space-between">
           <Grid item xs={12}>

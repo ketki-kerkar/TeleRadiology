@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, styled, TextField } from '@mui/material'; // Import styled from @mui/material
+import { Box, Button, styled } from '@mui/material'; // Import styled from @mui/material
 import './UnitCases.css'; // Import your CSS file for styling
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 // Style the Button component using the styled function
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -16,6 +18,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 function UnitCases() {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [userData, setUserData] = useState(null); // Initialize userData state with null
   const [error, setError] = useState(null); // Initialize error state with null
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +32,6 @@ function UnitCases() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authToken = localStorage.getItem('authToken');
         const response = await axios.post(`http://localhost:9191/api/v1/patient/viewCase`, {
           caseId: caseId // sending caseId in the body of the request
         }, {

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Navbar from '../../Components/Navbar';
 import Button from '@mui/material/Button';
-import axios from 'axios'; // Import Axios for making HTTP requests
+import axios from 'axios';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const containerStyle = {
   display: 'flex',
@@ -53,7 +55,7 @@ const senderTextStyle = {
 };
 
 const contentStyle = {
-  fontSize: '0.9vw',
+  fontSize: '1.5vw', // Increase the font size
   fontFamily: '"Quicksand", sans-serif'
 };
 
@@ -68,34 +70,76 @@ const buttonStyle = {
 };
 
 const Consent = () => {
-  const [invitations, setInvitations] = useState([
-    { id: 1, senderName: "Dr. Hermione Granger", caseSummary: "A 55-year-old male, presents with persistent lower back pain...", caseId: 123 },
-    { id: 2, senderName: "Dr. Lord Voldemort", caseSummary: "A 42-year-old female, presents with persistent abdominal pain...", caseId: 456 },
-  ]);
+const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
+  const [invitations, setInvitations] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [consentCards, setConsentCards] = useState([
-    { caseId: 1, hospitalName: "Hospital A", caseRegistration: "2024-05-05", caseStatus: "Pending", dname: "Dr. Lovegood" },
-    { caseId: 2, hospitalName: "Hospital B", caseRegistration: "2024-05-06", caseStatus: "Pending", dname: "Dr. Good" },
-    { caseId: 3, hospitalName: "Hospital C", caseRegistration: "2024-05-07", caseStatus: "Pending", dname: "Dr. Lov" },
-  ]);
+  const [consentCards, setConsentCards] = useState([]);
+  const [senderEmail, setSenderEmail] = useState("");
+  const [selectedCardId, setSelectedCardId] = useState(null); // New state to hold the selected card ID
+  const [selectedConsentCard, setSelectedConsentCard] = useState(null);
+  const email= loggedinUser.email;
 
-  const handleNotificationButtonClick = () => {
-    // Placeholder function for fetching notifications
-    console.log('Fetching notifications...');
+  useEffect(() => {
+    if (email && authToken) {
+      setSenderEmail(loggedinUser.email);
+    }
+  }, []); 
+
+
+  const handleNotificationButtonClick = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:9191/api/v1/notification/list-notifications',
+        { email: email },
+        { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
+      );
+      setInvitations(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
   };
 
-  const handleConsentButtonClick = () => {
-    // Placeholder function for fetching consent cards
-    console.log('Fetching consent cards...');
+  const handleConsentButtonClick = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:9191/api/v1/patient/consent-details',
+        { email: email },
+        { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
+      );
+      setConsentCards(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching consent cards:', error);
+    }
   };
 
-  const handleSelectButtonClick = () => {
-    // Placeholder function for handling card selection
-    console.log('Selected card:', selectedCard);
-  };
+  const handleSelectButtonClick = async () => {
+    if (selectedConsentCard) {
+      try {
+        const { caseId } = selectedConsentCard;
+        await axios.post(
+          'http://localhost:9191/api/v1/patient/sendNotifications',
+          { caseId, receiverEmail: selectedConsentCard.email, email},
+          { headers: { Authorization: `Bearer ${authToken}` } } // Add authToken to headers
+        );
+        console.log('Selected consent card sent to the backend:', { caseId, receiverEmail: selectedConsentCard.email, senderEmail });
 
-  const handleConsentCardSelect = (id) => {
-    setSelectedCard(id);
+        // Refresh the page after successful submission
+        window.location.reload();
+      } catch (error) {
+        console.error('Error sending selected consent card to the backend:', error);
+      }
+    } else {
+      console.log('No consent card selected.');
+    }
+  };  
+
+  const handleConsentCardSelect = (consentCard) => {
+    console.log("Selected card:", consentCard);
+    setSelectedCardId(consentCard.notificationId); // Update selectedCardId with notificationId
+    setSelectedConsentCard(consentCard); // Store the entire consent card object
   };
 
   return (
@@ -108,17 +152,14 @@ const Consent = () => {
           </div>
           <Grid container spacing={3}>
             {invitations.map((invitation) => (
-              <Grid item xs={12} key={invitation.id}>
+              <Grid item xs={12} key={invitation.notificationId}>
                 <Card
                   style={cardStyle}
-                  onClick={() => setSelectedCard(invitation.id)}
+                  onClick={() => setSelectedCard(invitation.notificationId)}
                 >
                   <CardContent>
-                    <Typography variant="h6" component="div" style={senderTextStyle}>
-                      {invitation.senderName} has invited you
-                    </Typography>
-                    <Typography variant="body2" component="p" style={contentStyle}>
-                      Case Summary: {invitation.caseSummary}
+                    <Typography variant="body2" component="div" style={contentStyle}>
+                      {invitation.messageText}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -138,9 +179,12 @@ const Consent = () => {
                 <input
                   type="radio"
                   name="consentCard"
-                  value={consentCard.id}
-                  checked={selectedCard === consentCard.id}
-                  onChange={() => handleConsentCardSelect(consentCard.id)}
+                  value={consentCard.email}
+                  checked={selectedCardId === consentCard.notificationId}
+                  onChange={() => {
+                    console.log("Radio button clicked with notificationId:", consentCard.notificationId);
+                    handleConsentCardSelect(consentCard);
+                  }}
                 />
                 <Typography variant="h6" component="div">
                   Case ID: {consentCard.caseId}
@@ -152,10 +196,13 @@ const Consent = () => {
                   Registration Date: {consentCard.caseRegistration}
                 </Typography>
                 <Typography variant="body2" component="p">
-                  Status: {consentCard.caseStatus}
+                  Status: {consentCard.status}
                 </Typography>
                 <Typography variant="body2" component="p">
                   Doctor Name: {consentCard.dname}
+                </Typography>
+                <Typography variant="body2" component="p">
+                  Doctor Email: {consentCard.email}
                 </Typography>
               </CardContent>
             </Card>
@@ -167,5 +214,3 @@ const Consent = () => {
 };
 
 export default Consent;
-
-

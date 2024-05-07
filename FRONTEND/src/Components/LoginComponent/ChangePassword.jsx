@@ -1,40 +1,65 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, Paper, Typography } from '@mui/material';
+import { TextField, Button, Grid, Paper, Typography, CssBaseline } from '@mui/material';
 import Navbar from '../Navbar';
 import Avatar from '@mui/material/Avatar';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
+import axios from 'axios';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ChangePassword({ userRole }) {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate form data
-    if (newPassword !== confirmPassword) {
-      setError("Passwords don't match");
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setError('Please fill in all fields.');
       return;
     }
-    // Implement logic for changing password
-    console.log('Changing password...');
-    // Reset form fields
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setError('');
+    if (newPassword !== confirmPassword) {
+      setError("Passwords don't match.");
+      return;
+    }
+    
+    try {
+      // Make a POST request to your API endpoint
+      const response = await axios.post('http://localhost:9191/api/v1/autheticate/changePass', {
+        oldPassword,
+        newPassword,
+      }, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }});
+      
+      console.log('Password successfully changed:', response.data);
+      // Reset form fields and error state
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setError('Password successfully changed.');
+    } catch (error) {
+      // Handle errors
+      console.error('Error changing password:', error);
+      setError('An error occurred while changing password.');
+    }
   };
 
   return (
     <div>
       <Navbar userRole={userRole} />
-      <Grid container justifyContent="center" style={{ height: '100vh', marginTop:'60px'}}>
+      <CssBaseline />
+      <Grid container justifyContent="center" style={{ height: '100vh', marginTop: '60px' }}>
         <Grid item xs={6}>
           <Paper style={{ padding: 20 }}>
-          <Avatar sx={{ bgcolor: '#1976D2',  margin: 'auto' , marginBottom:'10px'}}>
-         <EnhancedEncryptionIcon/>
-        </Avatar>
+            <Avatar sx={{ bgcolor: '#1976D2', margin: 'auto', marginBottom: '10px' }}>
+              <EnhancedEncryptionIcon />
+            </Avatar>
             <Typography variant="h5" gutterBottom>
               Change Password
             </Typography>
@@ -47,9 +72,7 @@ export default function ChangePassword({ userRole }) {
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 autoFocus
-                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
-                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
-                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
+                sx={inputStyles}
               />
               <TextField
                 label="New Password"
@@ -58,10 +81,7 @@ export default function ChangePassword({ userRole }) {
                 margin="normal"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                autoFocus
-                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
-                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
-                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
+                sx={inputStyles}
               />
               <TextField
                 label="Confirm New Password"
@@ -70,10 +90,7 @@ export default function ChangePassword({ userRole }) {
                 margin="normal"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                autoFocus
-                sx={{backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  '& .MuiInputLabel-root': {color: '#000'},
-                '& .MuiOutlinedInput-root': {'& fieldset': { borderColor: '#000', borderRadius: '4px', },'&:hover fieldset': { borderColor: '#000',},
-                  '&.Mui-focused fieldset': {borderColor: '#000', },},}}
+                sx={inputStyles}
               />
               {error && <Typography variant="body2" color="error">{error}</Typography>}
               <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: 20 }}>
@@ -86,3 +103,15 @@ export default function ChangePassword({ userRole }) {
     </div>
   );
 }
+
+// Common input styles
+const inputStyles = {
+  backgroundColor: '#fff',
+  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+  '& .MuiInputLabel-root': { color: '#000' },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': { borderColor: '#000', borderRadius: '4px' },
+    '&:hover fieldset': { borderColor: '#000' },
+    '&.Mui-focused fieldset': { borderColor: '#000' },
+  },
+};

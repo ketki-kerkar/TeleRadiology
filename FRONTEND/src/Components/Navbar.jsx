@@ -10,36 +10,49 @@ import { SidebarData } from './SidebarData';
 import logo from '../Images/Logo.jpeg'; // Import the logo
 import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import axios from 'axios';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../Context/LoggedInUserContext';
 
 function Navbar({ userRole }) {
   const navigate= useNavigate();
+  const { loggedinUser, setLoggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
 
-  const handleLogout = () => {
-    
-    localStorage.removeItem('authToken');
-    const authToken = localStorage.getItem('authToken');
-    console.clear();
-    console.log(authToken);
-    navigate('/'); 
+  const handleLogout = async () => {
+  
+    try {
+      await axios.post('http://localhost:9191/api/v1/logout', null, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+
+      console.clear();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
+
   const [sidebar, setSidebar] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
 
   const userSidebarData = SidebarData[userRole] || [];
 
+
   const handleNotificationClick = () => {
     let notificationRoute = '/';
     if (userRole === 'patient') {
-      notificationRoute = '/patient/consents';
+      notificationRoute = '/patient/consent';
     } else if (userRole === 'doctor') {
       notificationRoute = '/doctor/notifications';
     } else if (userRole === 'radiologist') {
-      notificationRoute = '/radiologist/invitations';
+      notificationRoute = '/radiologist/viewInvitations';
     }
     navigate(notificationRoute);
   };
-
 
   return (
     <>
@@ -51,7 +64,7 @@ function Navbar({ userRole }) {
           <ListItem><img src={logo} alt='RadilogyPlus' style={{ height: '50px', width: 'auto' }} /></ListItem> {/* Use the imported logo */}
           <Box display="flex" alignItems="center" justifyContent="flex-end" className='box'>
             <IconButton>
-              <NotificationsNoneIcon fontSize='large' onClick={() => handleNotificationClick()}/>
+            <NotificationsNoneIcon fontSize='large' onClick={() => handleNotificationClick()} />
             </IconButton>
             <IconButton>
               <AccountCircleOutlinedIcon fontSize='large' />

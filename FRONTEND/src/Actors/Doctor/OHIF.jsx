@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ChatRoom from '../../Components/ChatRoom';
 import Navbar from '../../Components/Navbar';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const OHIF = () => {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [jsonUrl, setJsonUrl] = useState('');
   const [caseId, setCaseId] = useState(1);
   const navigate = useNavigate();
@@ -12,7 +16,6 @@ const OHIF = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authToken = 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzaGF0YWtzaGkxMTRAZ21haWwuY29tIiwiaWF0IjoxNzE1MDgwMzI2LCJleHAiOjE3MTUxMTYzMjZ9.yaERf4-G60tMc62ft1AVB_zozUXPV1pIMDXu5synuhB21_jiZqixuKP5cBJ8ojVo';
         const response = await axios.get('http://localhost:9191/api/v1/doctor/get-json-aws-url', {
           params: {
             caseId: 1
@@ -38,7 +41,7 @@ const OHIF = () => {
 
   const handleAnotherAction = () => {
     console.log('Another Action button clicked!');
-    // Implement the functionality for the other button here
+    navigate('/doctor/listPatients/patientDetails/invite', { state: { caseId: caseId } })
   };
 
   return (

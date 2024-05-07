@@ -3,7 +3,12 @@ import { TextField, Button, Typography, Grid, Snackbar } from '@mui/material';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../../Components/Navbar';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';  
+
 const DiagnosisForm = () => {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [formData, setFormData] = useState({
     caseId: '',
     findings: '',
@@ -12,7 +17,6 @@ const DiagnosisForm = () => {
     techniques: ''
   });
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const authToken = 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzaGF0YWtzaGkxMTRAZ21haWwuY29tIiwiaWF0IjoxNzE0ODE1MDE4LCJleHAiOjE3MTQ4NTEwMTh9.QeEjBRkL3ZxYLiuHYcr8uLSYI1LrHxdC6qsaELFUy7V-u9E8AGM6Fi16PGec4142'; // Replace 'your-auth-token' with your actual auth token
   const location = useLocation();
   const { caseId } = location.state || {};
   

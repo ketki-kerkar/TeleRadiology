@@ -7,6 +7,9 @@ import Grid from '@mui/material/Grid';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useLocation , Link} from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const cardStyle = {
   marginTop: '20px',
@@ -66,9 +69,13 @@ const rejectButtonStyle = {
 };
 
 const Invitations = () => {
-  const authToken = localStorage.getItem('authToken');
-  const LoggedInEmail = localStorage.getItem('LoggedInEmail');
+  const location = useLocation();
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
+  const queryParams = new URLSearchParams(location.search);
+  const LoggedInEmail = loggedinUser.email;
   const [invitations, setInvitations] = useState([]);
+  const caseId = queryParams.get('caseId');
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -84,6 +91,7 @@ const Invitations = () => {
           }
         );
         setInvitations(response.data);
+        console.log(response.data)
       } catch (error) {
         console.error('Error fetching invitations:', error);
       }
@@ -129,14 +137,13 @@ const Invitations = () => {
     }
   };  
 
-  const handleViewClick = async (invitationId) => {
-    try {
-      await axios.post('/view-case', { caseId: invitationId });
-      console.log('Viewing case details...');
-    } catch (error) {
-      console.error('Error viewing case details:', error);
-    }
-  };
+  // const handleViewClick = async (caseId) => {
+  //   try {
+  //     navigate(`/radiologist/ohif/${caseId}`); // Redirect to /radiologist/ohif/:caseId
+  //   } catch (error) {
+  //     console.error('Error viewing case details:', error);
+  //   }
+  // };
 
   return (
     <div>
@@ -174,13 +181,20 @@ const Invitations = () => {
                       </Button>
                     </>
                   ) : (
+                    <Link to={{ 
+                      pathname: '/radiologist/ohifRadilogist', 
+                      search: `?caseId=${invitation.caseId}&doctorEmail=${LoggedInEmail}`
+                    }} 
+                    style={{textDecoration:'none'}}
+
+                  >
                     <Button 
                       variant="outlined" 
-                      style={viewButtonStyle} 
-                      onClick={() => handleViewClick(invitation.invitationId)}
+                      style={viewButtonStyle}
                     >
                       View
                     </Button>
+                    </Link>
                   )}
                 </div>
               </Card>

@@ -15,6 +15,8 @@ import StyledTableRow from '@mui/material/TableRow';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { CssBaseline } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -27,7 +29,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListLab() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [labs, setLabs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -52,6 +55,7 @@ export default function ListLab() {
     const filteredLabs = labs.filter(lab => lab.id.includes(searchQuery));
     setLabs(filteredLabs);
   };
+
 
   return (
     <div className='this-div'>

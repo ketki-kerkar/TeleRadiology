@@ -4,13 +4,14 @@ import { Grid, Typography, Paper, Divider, Button, CssBaseline, Avatar } from '@
 import { EmailOutlined, MedicalServicesOutlined} from '@mui/icons-material';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ViewLab() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [labData, setLabData] = useState({});
-  const [labName, setLabName] = useState('');
   const [labEmail, setLabEmail] = useState('');
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get('email');
@@ -25,7 +26,6 @@ export default function ViewLab() {
         });
 
         setLabData(response.data);
-        setLabName(response.data.labName);
         setLabEmail(response.data.email);
       } catch (error) {
         console.error('Error fetching lab data:', error);

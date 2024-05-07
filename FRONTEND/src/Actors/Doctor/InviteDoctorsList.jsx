@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useLocation } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -19,7 +20,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ViewDoctors() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const loggedInDoctorEmail = localStorage.getItem('userEmail');
   const [doctors, setDoctors] = useState([]);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -84,7 +86,7 @@ export default function ViewDoctors() {
     const selectedDoctorType = event.target.name;
     const isChecked = event.target.checked;
 
-    if (isChecked && selectedDoctorTypes.length < 3) {
+    if (isChecked && selectedDoctorTypes.length === 3) {
       setSelectedDoctorTypes((prevSelectedDoctorTypes) => [
         ...prevSelectedDoctorTypes,
         selectedDoctorType,

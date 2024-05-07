@@ -1,10 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Box, Typography, Checkbox, RadioGroup, FormControlLabel, Radio, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField} from '@mui/material';
 import Navbar from '../../Components/Navbar';
-import { Link } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function LaunchComplaint() {
+    const { loggedinUser } = useContext(LoggedInUserContext);
+    const authToken = loggedinUser.token;
     const boxRef = useRef(null);
     const [complaintType, setComplaintType] = useState('');
     const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
@@ -30,8 +33,6 @@ export default function LaunchComplaint() {
 
     const handleButtonClick = () => {
         if (isCheckboxChecked) {
-            const authToken = localStorage.getItem('authToken');
-            console.log("AuthToken:",authToken);
             const requestBody = {
                 email: LoggedInEmail, // Include LoggedInEmail as email
                 issueType: additionalInfo // Include additionalInfo as issueType

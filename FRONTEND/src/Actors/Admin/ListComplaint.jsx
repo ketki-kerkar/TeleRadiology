@@ -14,6 +14,8 @@ import Button from '@mui/material/Button';
 import StyledTableRow from '@mui/material/TableRow';
 import { CssBaseline } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -26,7 +28,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListComplaint() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [complaints, setComplaints] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredComplaints, setFilteredComplaints] = useState([]);

@@ -4,9 +4,11 @@ import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { CssBaseline, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import  { tableCellClasses } from '@mui/material/TableCell';
+import { tableCellClasses } from '@mui/material/TableCell';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const theme = createTheme({
   palette: {
@@ -18,7 +20,7 @@ const theme = createTheme({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#D7F5F2', // Change the background color here
+    backgroundColor: '#D7F5F2', 
     color: theme.palette.common.black,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -27,7 +29,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ViewDoctors() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [doctors, setDoctors] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,12 +42,11 @@ export default function ViewDoctors() {
     try {
       const response = await axios.get('http://localhost:9191/api/v1/admin/viewList/ofDoctors', {
         headers: {
-          Authorization: `Bearer ${authToken}`
+          Authorization: `Bearer ${authToken}`,
         }}) ;
       setDoctors(response.data);
     } catch (error) {
       console.error('Error fetching doctors:', error);
-      // Handle error, show a message to the user maybe
     }
   };
 
@@ -63,6 +65,7 @@ export default function ViewDoctors() {
   };
 
   return (
+    <>
     <ThemeProvider theme={theme}>
       <Navbar userRole="admin" />
       <CssBaseline />
@@ -94,7 +97,6 @@ export default function ViewDoctors() {
                 <StyledTableCell align="left">DOCTOR NAME</StyledTableCell>
                 <StyledTableCell align="left">HOSPITAL NAME</StyledTableCell>
                 <StyledTableCell align="left">EMAIL</StyledTableCell>
-                <StyledTableCell align="left">DOCTOR TYPE</StyledTableCell>
                 <StyledTableCell align="left">ACTIONS</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -107,7 +109,6 @@ export default function ViewDoctors() {
                     <TableCell align="left">{doctor.dname}</TableCell>
                     <TableCell align="left">{doctor.hospitalName}</TableCell>
                     <TableCell align="left">{doctor.email}</TableCell>
-                    <TableCell align="left">{doctor.dtype}</TableCell>
                     <TableCell align="left">
                     <Link to={{ pathname:'/admin/listDoctor/viewDoctor', search: `?email=${doctor.email}` }} style={{ textDecoration: 'none', color: '#fff' }}>
                       <Button variant="contained" style={{ backgroundColor: '#1976d2' }}>
@@ -122,5 +123,6 @@ export default function ViewDoctors() {
         </TableContainer>
       </div>
     </ThemeProvider>
+  </>
   );
 }

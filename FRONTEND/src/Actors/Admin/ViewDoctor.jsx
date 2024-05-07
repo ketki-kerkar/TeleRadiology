@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../Components/Navbar';
 import { Grid, Typography, Avatar, Paper, Divider, Button ,CssBaseline} from '@mui/material'; // Import necessary components from Material-UI
 import { EmailOutlined, SchoolOutlined, LocationOnOutlined, WorkOutline, MedicalServicesOutlined } from '@mui/icons-material'; // Import icons for decoration
-import axios from 'axios'; // Import Axios for making HTTP requests
-import { useLocation } from 'react-router-dom'; // Import useLocation hook
+import axios from 'axios'; 
+import { useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ViewDoctor() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [userData, setUserData] = useState([]);
 
   const location = useLocation();

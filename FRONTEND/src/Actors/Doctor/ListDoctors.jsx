@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import { CssBaseline } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -25,7 +26,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ViewDoctors() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [doctors, setDoctors] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -44,11 +46,7 @@ export default function ViewDoctors() {
 
     fetchData();
   }, [authToken]);
-  const handleViewDetails = (doctorId) => {
-    console.log("Viewing details of doctor with ID:", doctorId);
-    // Implement logic to view details
-  };
-
+  
 
   const handleSearch = () => {
     const filteredDoctors = doctors.filter(doctor => doctor.dname.includes(searchQuery));

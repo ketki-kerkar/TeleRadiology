@@ -5,6 +5,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from "../../Components/Navbar";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const theme = createTheme({
   palette: {
@@ -28,6 +30,9 @@ const StyledForm = styled('form')(({ theme }) => ({
 }));
 
 export default function AddPatient() {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [nameError, setNameError] = useState(false);
@@ -104,9 +109,12 @@ export default function AddPatient() {
       bloodGroup: bloodGroup,
       contact: contact,
       address: address,
-      emailId: email,
+      email: email,
     };
-    axios.post('http://localhost:9191/api/v1/receptionist/register', formData)
+    axios.post('http://localhost:9191/api/v1/receptionist/add-patient', formData, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      }})
       .then(response => {
         setSubmitting(false);
         setOpenDialog(true);
@@ -123,8 +131,8 @@ export default function AddPatient() {
   };
   return (
     <ThemeProvider theme={theme}>
-
-        <Navbar userRole="receptionist"/>
+  
+    <Navbar userRole="receptionist"/>
     <StyledContainer component="main" maxWidth="xs">
       <CssBaseline />
       <div>
@@ -176,8 +184,8 @@ export default function AddPatient() {
                 onChange={handleGenderChange}
                 label="Gender"
                 >
-                <FormControlLabel value="male" control={<Radio /> }  label="Male"/>
-                <FormControlLabel value="female" control={<Radio />} label="Female" />
+                <FormControlLabel value="Male" control={<Radio /> }  label="Male"/>
+                <FormControlLabel value="Female" control={<Radio />} label="Female" />
                 </RadioGroup>
             </Grid>
             <Grid item xs={12}>
@@ -296,7 +304,7 @@ export default function AddPatient() {
                     }}
                 />
             </Grid>
-            <Grid xs={12}>
+            <Grid item xs={12}>
             <FormControlLabel
                 required
                 control={<Checkbox value="remember" color="primary" />}

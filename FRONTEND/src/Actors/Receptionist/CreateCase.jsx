@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/system';
 import axios from 'axios';
-import { CssBaseline, Grid, TextField, Container, Typography, Button, Paper, FormControl, MenuItem, Select, InputLabel, Snackbar, Alert , Autocomplete} from '@mui/material';
+import { CssBaseline, Grid, TextField, Autocomplete, Container, Typography, Button, Paper, FormControl, MenuItem, Select, InputLabel, Snackbar, Alert } from '@mui/material';
 import Navbar from '../../Components/Navbar';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const theme = createTheme({
   palette: {
@@ -36,7 +38,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export default function CreateCase() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [patientEmail, setPatientEmail] = useState('');
   const [suggestedPatientEmails, setSuggestedPatientEmails] = useState([]);
   const [patientData, setPatientData] = useState(null);
@@ -83,7 +86,7 @@ export default function CreateCase() {
       });
       const patient = response.data.patients[0]; 
       setPatientData(patient);
-      console.log(patient);
+      console.log(patientData);
     } catch (error) {
       console.error('Error fetching patient data:', error);
     }
@@ -92,10 +95,8 @@ export default function CreateCase() {
   useEffect(() => {
     if (patientEmail) {
       fetchData();
-    } else {
-      setPatientData(null); 
     }
-  }, [patientEmail]);
+  }, [authToken, patientEmail]);
 
   const handleDoctorChange = (event) => {
     setSelectedDoctor(event.target.value);
@@ -141,7 +142,7 @@ export default function CreateCase() {
       <CssBaseline />
       <StyledContainer>
         <Grid item xs={12}>
-          <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', margin: '10px 0px' }}>Select the patient Email for new case:</Typography>
+          <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', margin: '10px 0px' }}>Select the patient Id for new case:</Typography>
           <Autocomplete
             id="patient-email-autocomplete"
             options={suggestedPatientEmails}
@@ -194,20 +195,18 @@ export default function CreateCase() {
             </StyledPaper>
           )}
           <Grid item xs={12}>
-            <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', marginTop: '20px' }}>Select the Doctor for this patient:</Typography>
+            <Typography variant="body1" sx={{ display: 'flex', alignItems: 'baseline', marginTop: '20px' }}>Select the Doctor to this patient:</Typography>
             <FormControl fullWidth variant="outlined" sx={{ margin: '10px 0px', textAlign: 'left', backgroundColor: '#fff', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', '& .MuiInputLabel-root': { color: '#000' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#000', borderRadius: '4px', }, '&:hover fieldset': { borderColor: '#000', }, '&.Mui-focused fieldset': { borderColor: '#000', }, }, }}>
-              <InputLabel id="doctor-label">Doctor</InputLabel>
+              <InputLabel id="hospital">Doctor</InputLabel>
               <Select
                 required
-                labelId="doctor-label"
-                id="doctor-select"
+                labelId="doctor"
+                id="doctor"
                 value={selectedDoctor}
                 onChange={handleDoctorChange}
-                label="Doctor"
+                label="Hospital"
               >
-                <MenuItem value="" disabled>
-                  Select
-                </MenuItem>
+                <MenuItem disabled>Select</MenuItem>
                 {doctor.map((doctorEmail, index) => (
                   <MenuItem key={index} value={doctorEmail}>
                     {doctorEmail}

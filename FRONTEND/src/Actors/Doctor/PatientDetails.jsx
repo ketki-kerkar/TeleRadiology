@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/system';
 import { CssBaseline, Typography, Avatar, Grid, Paper , Snackbar, Alert, TextField, Button, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { useLocation , Link} from 'react-router-dom'; 
-
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 
 
@@ -61,7 +61,8 @@ const StyledForm = styled('form')(({ theme }) => ({
 }));
 
 function PatientCard() {
-  const authToken = localStorage.getItem('authToken')
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [patientDetails, setPatientDetails] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [submittingCase, setSubmittingCase] = useState(false);
@@ -92,11 +93,12 @@ function PatientCard() {
           }
         });
         const patient = response.data.patients[0];
-      
+        setPatientDetails(patient);
+        console.log(patientDetails);
 
         if (patient.patients && patient.patients.length > 0) {
-          setPatientDetails(patient);
           if (patient.prescriptionTests) {
+            
             setPrescription(patient.prescriptionTests);
             setPrescriptionExists(true);
           }
@@ -433,7 +435,7 @@ function PatientCard() {
                           '&.Mui-focused fieldset': { borderColor: '#000' },
                         },
                       }}>
-                  <InputLabel id="Qualification">Mark Case Severity</InputLabel>
+                  <InputLabel id="severity">Mark Case Severity</InputLabel>
                   <Select
                       labelId="severity"
                       id="severity"
@@ -446,10 +448,10 @@ function PatientCard() {
                       <MenuItem value="2">Medium(2)</MenuItem>
                       <MenuItem value="3">Low(3)</MenuItem>
                   </Select>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between',marginTop: '20px' }}> 
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}> 
                   <Button 
                       variant="contained" 
-                      style={{ display: 'flex', justifyContent:'flex-start', marginBottom: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }}  
+                      style={{ marginBottom: '20px', backgroundColor: '#1976d2', color: '#fff', borderRadius: '5px' }}  
                       onClick={handleSeveritySubmit} 
                       disabled={submittingSeverity}
                       
@@ -464,13 +466,13 @@ function PatientCard() {
                   <Snackbar open={errorAlertSeverityOpen} autoHideDuration={6000} onClose={handleCloseErrorSeverityAlert}>
                     <Alert onClose={handleCloseErrorSeverityAlert} severity="error" sx={{ width: '100%' }}>
                       Severity could not be added. Please try again later.
-                    </Alert>
+                    </Alert>,marginTop: '20px'
                   </Snackbar>
                 </Box>
                   </FormControl>
                   <Typography variant='h6' sx={{textAlign: 'left'}}>Navigate To View Reports and Chats</Typography>
                 <Link to={{ 
-                          pathname: '/doctor/listPatients/patientdetails/chat', 
+                          pathname: '/doctor/listPatients/patientdetails/reports', 
                           search: `?caseId=${caseId}&doctorEmail=${doctorEmail}&patientEmail=${patientEmail}`
                         }} 
                         style={{textDecoration:'none'}}

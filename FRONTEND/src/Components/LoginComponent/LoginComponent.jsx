@@ -13,33 +13,56 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useState } from 'react'; // Import useState
-import { useNavigate } from 'react-router-dom';
+import { useState , useRef, useContext} from 'react'; 
+import { useNavigate} from 'react-router-dom';
+import useAuth from '../../Hooks/useAuth';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const defaultTheme = createTheme();
 
-export default function SignInSide() {
+export default function LoginComponent() {
+  const { setAuth } = useAuth();
   const navigate = useNavigate();
+  const userRef = useRef();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [token, setToken] = useState('');
+  const { loggedinUser, setLoggedinUser } = useContext(LoggedInUserContext);
   
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => { 
     event.preventDefault();
     setIsLoading(true);
-
     try {
       const response = await axios.post('http://localhost:9191/api/v1/authenticate', {
         email: email,
         password: password
       });
 
-      const userData = response.data;
-      localStorage.setItem('authToken', userData.token);
+      console.log(JSON.stringify(response?.data));
+      const accessToken = response?.data?.accessToken;
+      const roles = response?.data?.roles;
+      setAuth({ email, password, roles, accessToken });
+      setEmail('');
+      setPassword('');
 
+      const userData = response.data;
+      const authToken = userData.token;
       const role = userData.role;
 
+      setLoggedinUser({
+        ...loggedinUser,
+        token: userData.token,
+        user: userData.user,
+        role: role,
+      });
+
+      setToken(authToken);
+      console.log("role", role);
+      console.log(role,"\n","authtoken begins", authToken, "ends");
+  
       switch (role) {
         case 'doctor':
           navigate('/doctor');
@@ -60,8 +83,10 @@ export default function SignInSide() {
           navigate('/patient');
           break;
         default:
-          navigate('/');
+          // If no specific role matches, you can redirect to a default route
+          navigate('/login');
       }
+
     } catch (error) {
       console.error(error);
       let errorMessage = "An error occurred";
@@ -72,9 +97,11 @@ export default function SignInSide() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+  
 
   return (
+    <>
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
@@ -114,6 +141,7 @@ export default function SignInSide() {
                 required
                 fullWidth
                 id="email"
+                ref={userRef}
                 label="Email Address"
                 name="email"
                 autoComplete="email"
@@ -170,5 +198,6 @@ export default function SignInSide() {
         </Grid>
       </Grid>
     </ThemeProvider>
+    </>
   );
 }

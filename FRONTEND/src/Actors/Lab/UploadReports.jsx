@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import Navbar from '../../Components/Navbar';
 import axios from 'axios';
 import { CssBaseline, Grid, TextField, Container, Typography } from '@mui/material';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 function UploadReports() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [dicomFile, setDicomFile] = useState(null);
   const [jsonFile, setJsonFile] = useState(null);
   const [prescriptionId, setPrescriptionId] = useState('');

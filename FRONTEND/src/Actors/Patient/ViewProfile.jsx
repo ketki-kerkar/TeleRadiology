@@ -7,8 +7,12 @@ import Profile from '../../Images/icon1.svg';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ViewProfile() {
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -16,8 +20,7 @@ export default function ViewProfile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user data using the stored auth token
-        const authToken = localStorage.getItem('authToken'); // assuming auth token is stored in local storage
+
         const response = await axios.get('http://localhost:9191/api/v1/patient/patient-details', {
           headers: {
             Authorization: `Bearer ${authToken}`,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
 import Navbar from '../../Components/Navbar';
@@ -16,6 +16,7 @@ import StyledTableRow from '@mui/material/TableRow';
 import { CssBaseline } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import StatusIndicator from '../../Components/caseStausIndicator';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -28,7 +29,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 export default function ListPatients() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [patients, setPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 

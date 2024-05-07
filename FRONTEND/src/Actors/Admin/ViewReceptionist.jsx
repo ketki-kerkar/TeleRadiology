@@ -4,12 +4,13 @@ import { Grid, Typography, Paper, Divider, Button, CssBaseline, Avatar } from '@
 import { EmailOutlined, LocationCityOutlined } from '@mui/icons-material';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ViewReceptionist() {
-  const authToken = localStorage.getItem('authToken');
+  const { loggedinUser } = useContext(LoggedInUserContext);
+  const authToken = loggedinUser.token;
   const [receptionistData, setReceptionistData] = useState({});
-  const [receptionistEmail, setReceptionistEmail] = useState('');
-  const [hospitalName, setHospitalName] = useState('');
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -25,8 +26,6 @@ export default function ViewReceptionist() {
         });
 
         setReceptionistData(response.data);
-        setReceptionistEmail(response.data.email);
-        setHospitalName(response.data.hospitalName);
       } catch (error) {
         console.error('Error fetching receptionist data:', error);
       }

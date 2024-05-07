@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../Components/Navbar';
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Container, Grid, Typography } from '@mui/material';
 import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useContext } from 'react';
+import { LoggedInUserContext } from '../../Context/LoggedInUserContext';
 
 export default function ViewCase() {
+    const { loggedinUser } = useContext(LoggedInUserContext);
+    const authToken = loggedinUser.token;
     const [cases, setCases] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+   // console.log(email);
+    console.log(authToken);
 
     const handleSearch = async () => {
         try {
-            const authToken = localStorage.getItem('authToken');
             if (!authToken) {
                 throw new Error('Authentication token not found');
             }
@@ -38,7 +43,7 @@ export default function ViewCase() {
     };
 
     const handleNavigateToUnitCases = (caseId) => {
-        navigate(/patient/viewCase/unitCases, { state: { caseId } });
+        navigate(`/patient/viewCase/unitCases`, { state: { caseId } });
     };
 
     useEffect(() => {

@@ -14,6 +14,7 @@ import GradingIcon from '@mui/icons-material/Grading';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import './Navbar.css';
+import './Navbar.css';
 
 
 export const SidebarData = {
@@ -75,18 +76,6 @@ export const SidebarData = {
       cName: 'nav-text'
     },
     {
-      title: 'Reports',
-      path: '/doctor',
-      icon: <ReceiptIcon/>,
-      cName: 'nav-text'
-    },
-    {
-      title: 'View Invitations',
-      path: '/doctor/viewInvitations',
-      icon: <DraftsIcon className="icon-hover" />,
-      cName: 'nav-text'
-    },
-    {
       title: 'Change Password',
       path: '/doctor/changePassword',
       icon: <LockOpenIcon/>,
@@ -139,6 +128,32 @@ export const SidebarData = {
       cName: 'nav-text'
     },
   ],
+  radiologist:[
+    {
+      title: 'Home',
+      path: '/radiologist',
+      icon: <HomeIcon className="icon-hover"/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'View Invitations',
+      path: '/radiologist/viewInvitations',
+      icon: <DraftsIcon className="icon-hover" />,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Active Cases',
+      path: '/radiologist/viewCases',
+      icon: <ReceiptIcon/>,
+      cName: 'nav-text'
+    },
+    {
+      title: 'Change Password',
+      path: '/radiologist/changePassword',
+      icon: <LockOpenIcon/>,
+      cName: 'nav-text'
+    },
+  ],
   patient: [
     {
       title: 'Home',
@@ -171,31 +186,4 @@ export const SidebarData = {
       cName: 'nav-text'
     },
   ],
-  radiologist:[
-    {
-      title: 'Home',
-      path: '/radiologist',
-      icon: <HomeIcon className="icon-hover"/>,
-      cName: 'nav-text'
-    },
-    {
-      title: 'View Invitations',
-      path: '/radiologist/viewInvitations',
-      icon: <DraftsIcon className="icon-hover" />,
-      cName: 'nav-text'
-    },
-    {
-      title: 'Active Cases',
-      path: '/radiologist/viewCases',
-      icon: <ReceiptIcon/>,
-      cName: 'nav-text'
-    },
-    {
-      title: 'Change Password',
-      path: '/radiologist/changePassword',
-      icon: <LockOpenIcon/>,
-      cName: 'nav-text'
-    },
-    
-  ]
 };
